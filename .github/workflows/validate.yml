@@ -1,0 +1,118 @@
+name: Validate Skill
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate skill structure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4
+
+      - name: Verify file count
+        run: |
+          count=$(find . -type f -name "*.md" -not -path "./.git/*" | wc -l)
+          echo "Total .md files: $count"
+          if [ "$count" -lt 100 ]; then
+            echo "::error::Suspeito: poucos ficheiros .md ($count). Esperado ≥100."
+            exit 1
+          fi
+
+      - name: Validate SKILL.md frontmatter
+        run: |
+          if ! head -1 SKILL.md | grep -q '^---$'; then
+            echo "::error::SKILL.md não começa com frontmatter ---"
+            exit 1
+          fi
+          if ! grep -q '^name:' SKILL.md; then
+            echo "::error::SKILL.md sem campo 'name:' no frontmatter"
+            exit 1
+          fi
+          if ! grep -q '^description:' SKILL.md; then
+            echo "::error::SKILL.md sem campo 'description:' no frontmatter"
+            exit 1
+          fi
+          echo "✓ SKILL.md frontmatter válido"
+
+      - name: Check PROMPT-COMPACTO size (ChatGPT 8000 char limit)
+        run: |
+          size=$(wc -c < PROMPT-COMPACTO.md)
+          echo "PROMPT-COMPACTO.md: $size bytes"
+          if [ "$size" -gt 8000 ]; then
+            echo "::error::PROMPT-COMPACTO.md excede 8000 chars ($size). Não cabe em ChatGPT Custom GPT Instructions."
+            exit 1
+          fi
+          echo "✓ PROMPT-COMPACTO.md dentro do limite (folga: $((8000 - size)) chars)"
+
+      - name: Check for broken cross-references
+        run: |
+          broken=0
+          for prefix in "analises/" "linguagens/" "frameworks/" "mobile/" "outras-areas/" "relatorio/"; do
+            while IFS= read -r ref; do
+              if [ ! -f "$ref" ]; then
+                echo "::error::Referência quebrada: $ref"
+                broken=$((broken + 1))
+              fi
+            done < <(grep -rh -oE "${prefix}[a-zA-Z0-9_/-]+\.md" --include="*.md" | sort -u)
+          done
+          if [ "$broken" -gt 0 ]; then
+            echo "::error::$broken referências quebradas encontradas"
+            exit 1
+          fi
+          echo "✓ Zero referências quebradas"
+
+      - name: Check for duplicate files (md5 hash)
+        run: |
+          dups=$(find . -type f -name "*.md" -not -path "./.git/*" -exec md5sum {} \; | sort | awk '{print $1}' | uniq -d | wc -l)
+          if [ "$dups" -gt 0 ]; then
+            echo "::error::$dups duplicados exatos encontrados"
+            find . -type f -name "*.md" -not -path "./.git/*" -exec md5sum {} \; | sort | awk '{print $1}' | uniq -d | while read hash; do
+              find . -type f -name "*.md" -not -path "./.git/*" -exec md5sum {} \; | grep "$hash"
+            done
+            exit 1
+          fi
+          echo "✓ Zero duplicados"
+
+      - name: Verify all .md files have H1 or frontmatter
+        run: |
+          missing=0
+          while IFS= read -r f; do
+            first=$(head -1 "$f")
+            if ! echo "$first" | grep -qE '^(#[^#]|---)'; then
+              echo "::warning::$f sem H1 ou frontmatter na primeira linha"
+              missing=$((missing + 1))
+            fi
+          done < <(find . -type f -name "*.md" -not -path "./.git/*")
+          if [ "$missing" -gt 0 ]; then
+            echo "::error::$missing ficheiros sem H1/frontmatter"
+            exit 1
+          fi
+          echo "✓ Todos os .md têm H1 ou frontmatter"
+
+      - name: Markdown lint
+        uses: DavidAnson/markdownlint-cli2-action@db43aef879112c3119a410d69f66701e0d530809  # v17
+        with:
+          globs: '**/*.md'
+          config: '.markdownlint.json'
+        continue-on-error: true  # warn but don't block
+
+  size-check:
+    name: Skill total size sanity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+
+      - name: Total size sanity (under 5MB)
+        run: |
+          size_kb=$(du -sk --exclude=.git . | cut -f1)
+          echo "Skill total: ${size_kb} KB"
+          if [ "$size_kb" -gt 5120 ]; then
+            echo "::error::Skill > 5MB ($size_kb KB). Verificar se ficheiros binários foram adicionados."
+            exit 1
+          fi
+          echo "✓ Tamanho razoável"

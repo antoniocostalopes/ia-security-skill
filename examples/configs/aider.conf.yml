@@ -1,0 +1,33 @@
+# Aider config para usar a IA Security Skill
+# Coloca este ficheiro em: ~/.aider.conf.yml ou .aider.conf.yml na raiz do projeto
+
+# Carregar PROMPT principal como sistema
+read:
+  - /caminho/para/ia-security-skill/PROMPT.md
+
+# Em alternativa, carregar PROMPT-COMPACTO se contexto limitado
+# read:
+#   - /caminho/para/ia-security-skill/PROMPT-COMPACTO.md
+
+# Para projetos onde queres carregar análises específicas
+# read:
+#   - /caminho/para/ia-security-skill/analises/00-mindset-atacante.md
+#   - /caminho/para/ia-security-skill/analises/xss.md
+#   - /caminho/para/ia-security-skill/analises/sql-injection.md
+#   - /caminho/para/ia-security-skill/relatorio/template.md
+
+# Modelo recomendado para auditoria de segurança
+# (Claude lida bem com instruções estruturadas e cross-references)
+model: claude-3-5-sonnet-20241022
+# alternativas: gpt-4-turbo, gemini-1.5-pro
+
+# Para auditorias longas, aumentar context
+max-chat-history-tokens: 8192
+
+# Não auto-commit (queres rever antes)
+auto-commits: false
+
+# Mensagem inicial sugerida
+# Após `aider`, escreve:
+#   /add ficheiro_a_auditar.php
+#   audita este ficheiro com a skill de segurança

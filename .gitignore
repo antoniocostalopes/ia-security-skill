@@ -1,0 +1,70 @@
+# ── OS ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editores ───────────────────────────────────────
+*.swp
+*.swo
+*.bak
+*~
+*.orig
+.idea/
+.vscode/
+*.sublime-*
+.history/
+
+# ── IA / Tooling local ─────────────────────────────
+.claude/
+
+# ── Linguagens (caso contributors corram scripts) ──
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.tox/
+.eggs/
+*.egg-info/
+.bundle/
+vendor/
+
+# ── Build / output ─────────────────────────────────
+dist/
+build/
+out/
+target/
+*.class
+
+# ── Test coverage ──────────────────────────────────
+coverage/
+.coverage
+htmlcov/
+.nyc_output/
+*.lcov
+
+# ── Secrets / config local ─────────────────────────
+.env
+.env.*
+secrets/
+*.pem
+*.key
+*.cert
+*.crt
+
+# ── Logs / temp ────────────────────────────────────
+*.log
+*.tmp
+*.temp
+
+# ── Archives (commit acidental) ────────────────────
+*.tar.gz
+*.tgz
+*.zip
+*.7z
+*.rar
+
+# Ficheiros excluídos do repo
+system-prompt.txt

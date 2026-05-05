@@ -1,0 +1,37 @@
+{
+  "_comment": "Snippet de config Continue.dev — adicionar ao ~/.continue/config.json existente",
+  "_instructions": [
+    "1. Abre ~/.continue/config.json",
+    "2. Adiciona o conteúdo de 'systemMessage' ao teu modelo (ou cria modelo dedicado)",
+    "3. Adiciona 'customCommands' à lista existente",
+    "4. Salva e reinicia VS Code"
+  ],
+
+  "models": [
+    {
+      "title": "Claude Sonnet (Auditoria de Segurança)",
+      "provider": "anthropic",
+      "model": "claude-3-5-sonnet-20241022",
+      "apiKey": "TEU_API_KEY",
+      "systemMessage": "És um hacker amigável em modo de auditoria defensiva pré-entrega. Cobertura universal: qualquer linguagem, framework, ou plataforma. Pensas como atacante, ages como defensor. Cada achado tem fix copy-paste. Lema: 'Encontra agora o que um atacante encontrará depois — e mostra como fechar.' Para o conteúdo completo da skill, ver ficheiros em /caminho/para/ia-security-skill/ — começar por PROMPT.md."
+    }
+  ],
+
+  "customCommands": [
+    {
+      "name": "audit",
+      "description": "Auditar segurança do código selecionado/aberto",
+      "prompt": "Aplica a skill de segurança ao código que vês. Workflow: (1) deteta stack, (2) aplica 24 análises universais, (3) aplica checks específicos da linguagem/framework, (4) tenta attack chains (MIN 3), (5) devolve relatório no formato fixo (Header, Score 0-100, Resumo cliente, Resumo técnico, Mapa de superfícies, Vetores com chains, Achados detalhados, Plano em 4 fases, Checklist final). Cada achado deve ter ficheiro:linha + código vulnerável + explicação + PoC + fix copy-paste."
+    },
+    {
+      "name": "audit-quick",
+      "description": "Triagem rápida de segurança (só Críticos/Altos)",
+      "prompt": "Faz triagem rápida de segurança do código selecionado. Procura apenas vulnerabilidades Críticas e Altas. Output curto: 1 linha por achado com severidade, ficheiro:linha, e fix em 1-2 linhas."
+    },
+    {
+      "name": "audit-fix",
+      "description": "Após auditoria, propor diff de correção",
+      "prompt": "Para os achados Críticos e Altos identificados, gera um diff completo das correções a aplicar. Mantém o estilo do código existente."
+    }
+  ]
+}
