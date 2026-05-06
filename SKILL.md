@@ -43,20 +43,32 @@ Esta skill tem ~135 ficheiros mas em runtime carregas **15-50 conforme stack det
 
 ### NÃO carregar (a menos que confirmado)
 - `mobile/*` — só se `Info.plist`, `AndroidManifest.xml`, `pubspec.yaml`, `react-native.config.js` ou similar existir
+- `desktop/*` — só se `package.json` com `electron`, `tauri.conf.json`, ou `wails.json`
+- `extensions/*` — só se `manifest.json` na raiz com `manifest_version`
 - `outras-areas/web3-smart-contracts.md` — só se `*.sol`, `hardhat.config`, `foundry.toml`, `truffle-config.js`
 - `outras-areas/iac-terraform.md` — só se `*.tf`, `*.tfvars`
 - `outras-areas/cloud-{aws,gcp,azure}.md` — só se SDK correspondente (`aws-sdk`, `@google-cloud/*`, `@azure/*`) ou IaC do provider
 - `outras-areas/containers-k8s.md` — só se `Dockerfile`, `docker-compose.yml`, `*.yaml` K8s, `helm/`
+- `outras-areas/container-runtime.md` — só se Falco/AppArmor/seccomp specs presentes ou audit em runtime
+- `outras-areas/service-mesh.md` — só se Istio/Linkerd/Consul Connect ativos no cluster
 - `outras-areas/ci-cd-pipelines.md` — só se auditar pipeline (`.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`)
-- `outras-areas/ml-ai-security.md` — só se `requirements.txt`/`pyproject.toml` com `torch`/`tensorflow`/`langchain`/`openai`
+- `outras-areas/ml-ai-security.md` — só se `requirements.txt`/`pyproject.toml` com `torch`/`tensorflow`
+- `outras-areas/llm-agent-security.md` — só se `openai`/`anthropic`/`langchain`/`llamaindex`/`claude-agent-sdk` no projeto, ou agentes com tool use
 - `outras-areas/iot-embedded.md` — só se firmware/embedded explícito
+- `outras-areas/game-security.md` — só se Unity/Unreal/Godot/multiplayer netcode
+- `outras-areas/webassembly.md` — só se `.wasm` files, `wasm-bindgen`, `assemblyscript`, target `wasm32`
+- `outras-areas/service-workers-pwa.md` — só se `service-worker.js`/`sw.js` ou `workbox`/`next-pwa`/`vite-plugin-pwa`
+- `outras-areas/multi-tenant-saas.md` — só se schema com `tenant_id`/`org_id`/`workspace_id` em múltiplas tabelas
+- `outras-areas/dns-security.md` — só se zone files, IaC com DNS records, ou domain-level audit
+- `outras-areas/email-infrastructure.md` — só se mail server config, DNS com SPF/DKIM/DMARC, app envia email transacional em volume
+- `outras-areas/post-quantum-crypto.md` — só se confidentiality requirement ≥10 anos (medical/government/defense/legal archives) ou migração TLS hybrid em curso
 - `examples/*` — ler 1 example da família stack como few-shot, não todos
 
 ### Para auditoria de 1 ficheiro só (quick scan)
 Salta `analises/00-attack-chains.md` (precisa de superfície agregada).
 
 Índices completos:
-- [`analises/README.md`](analises/README.md) · [`linguagens/README.md`](linguagens/README.md) · [`frameworks/README.md`](frameworks/README.md) · [`mobile/README.md`](mobile/README.md) · [`outras-areas/README.md`](outras-areas/README.md) · [`relatorio/README.md`](relatorio/README.md)
+- [`analises/README.md`](analises/README.md) · [`linguagens/README.md`](linguagens/README.md) · [`frameworks/README.md`](frameworks/README.md) · [`mobile/README.md`](mobile/README.md) · [`desktop/README.md`](desktop/README.md) · [`extensions/README.md`](extensions/README.md) · [`outras-areas/README.md`](outras-areas/README.md) · [`relatorio/README.md`](relatorio/README.md)
 
 ## Workflow — 7 fases
 

@@ -265,3 +265,154 @@ Antes de entregar, corre o site nestas 3 ferramentas. Score A+ no SecurityHeader
 - **Médio:** sem X-Frame-Options (clickjacking)
 - **Médio:** cookies de sessão sem `Secure`/`HttpOnly`
 - **Baixo:** `X-Powered-By` exposto
+
+---
+
+## Headers modernos (2024-2025)
+
+Para além dos clássicos acima, os browsers introduziram headers novos que valem a pena adoptar.
+
+### Trusted Types — anti-XSS estrutural
+
+Bloqueia `eval`, `innerHTML` e outros sinks DOM perigosos a menos que recebam um Trusted Type.
+
+```http
+Content-Security-Policy: require-trusted-types-for 'script'; trusted-types default;
+```
+
+```javascript
+// Sem Trusted Types: bloqueado
+element.innerHTML = userInput;  // throws TypeError
+
+// Com Trusted Types: explícito
+const policy = trustedTypes.createPolicy('default', {
+  createHTML: input => DOMPurify.sanitize(input)
+});
+element.innerHTML = policy.createHTML(userInput);  // OK
+```
+
+**Quando aplicar:** apps SPA modernas (React, Vue, Svelte) onde podes refactor sinks. Migration phase: usar `report-only`:
+```http
+Content-Security-Policy-Report-Only: require-trusted-types-for 'script'; report-uri /csp-report
+```
+
+### Cross-Origin Opener Policy (COOP)
+
+Isola browsing context contra cross-origin window references.
+
+```http
+Cross-Origin-Opener-Policy: same-origin
+```
+
+Valores:
+- `unsafe-none` (default) — sem isolation
+- `same-origin-allow-popups` — permite popups (OAuth flows)
+- `same-origin` — máximo isolation, quebra OAuth se não tratado
+
+**Quando matter:** mitiga Spectre side-channels, evita `window.opener` attacks.
+
+### Cross-Origin Embedder Policy (COEP)
+
+Requer que recursos cross-origin sejam servidos com explicit consent.
+
+```http
+Cross-Origin-Embedder-Policy: require-corp
+```
+
+Combinado com COOP `same-origin`, dá **Cross-Origin Isolation**, que é pré-requisito para:
+- `SharedArrayBuffer` (necessário para Wasm threading)
+- `performance.now()` com high precision
+- `Web Audio API` advanced features
+
+**Cuidado:** quebra embeds que não enviam `Cross-Origin-Resource-Policy`. Adoção gradual com `report-only`.
+
+### Cross-Origin Resource Policy (CORP)
+
+Servidor declara quem pode embedar este recurso.
+
+```http
+Cross-Origin-Resource-Policy: same-origin
+```
+
+Valores:
+- `same-site` — só same-site pode embedar
+- `same-origin` — só same-origin
+- `cross-origin` — qualquer site (default para CDN público)
+
+**Quando aplicar:** APIs sensíveis (`/api/user/profile`) devem ter `same-origin` para evitar leak via embed cross-origin.
+
+### Document-Policy
+
+Substitui parcialmente `Feature-Policy`. Controla features do document a um nível mais granular.
+
+```http
+Document-Policy: document-write=?0, sync-script=?0, sync-xhr=?0
+```
+
+### Network Error Logging (NEL)
+
+Browser reporta network errors para endpoint definido.
+
+```http
+Report-To: {"group":"nel","max_age":2592000,"endpoints":[{"url":"https://example.com/nel"}]}
+NEL: {"report_to":"nel","max_age":2592000}
+```
+
+Útil para detectar TLS failures, DNS issues, MITM attempts em produção.
+
+### Reporting API moderna
+
+Substitui `report-uri` (deprecated em CSP3) e `Report-To`. Header `Reporting-Endpoints`:
+
+```http
+Reporting-Endpoints: csp-endpoint="https://example.com/csp-reports", default="https://example.com/reports"
+Content-Security-Policy: default-src 'self'; report-to csp-endpoint
+```
+
+### Origin-Agent-Cluster
+
+Isolation forte entre same-site origins para protection contra side-channels:
+
+```http
+Origin-Agent-Cluster: ?1
+```
+
+### Speculation Rules — não é segurança per se mas atenção
+
+Browser pré-renderiza páginas baseado em rules:
+```html
+<script type="speculationrules">
+{ "prerender": [{"urls": ["/checkout"]}] }
+</script>
+```
+
+**Risco:** prerendering pode disparar side-effects (analytics, auth refresh) sem user navigation. Validar antes de adoptar.
+
+### Quick wins headers modernos
+
+- [ ] `Cross-Origin-Opener-Policy: same-origin` (com tratamento de OAuth popups)
+- [ ] `Cross-Origin-Resource-Policy: same-origin` em APIs sensíveis
+- [ ] Trusted Types em modo report-only para começar
+- [ ] `Reporting-Endpoints` configurado (CSP, NEL, deprecation)
+- [ ] NEL ativo para detectar issues de transport em produção
+- [ ] COEP `require-corp` se queres SharedArrayBuffer / Wasm threading
+- [ ] `Origin-Agent-Cluster: ?1` para apps sensíveis
+- [ ] Document-Policy bloqueia features sync que afectam performance
+
+### Falsos positivos modernos
+
+- COOP `same-origin` quebra OAuth popups que dependem de `window.opener` — use `same-origin-allow-popups`
+- COEP `require-corp` requer todos embeds (imagens CDN, fonts, analytics scripts) com CORP — quebra muito sem coordenação
+- Trusted Types quebra qualquer biblioteca que faça `innerHTML` (jQuery, marked, etc.) — refactor incremental
+
+### Severidade dos headers modernos
+
+- **Médio:** falta de COOP/COEP em app que processa cross-origin sensitive data
+- **Médio:** sem Trusted Types em SPA com user content rendering
+- **Baixo:** sem NEL/Reporting (perdes visibility, não é breach risk direto)
+- **Baixo:** sem Document-Policy
+
+### Cross-references modernas
+
+- [`../outras-areas/service-workers-pwa.md`](../outras-areas/service-workers-pwa.md) — COEP afeta SW fetch
+- [`../outras-areas/webassembly.md`](../outras-areas/webassembly.md) — COOP+COEP para SAB

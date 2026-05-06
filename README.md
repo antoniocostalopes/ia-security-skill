@@ -126,7 +126,11 @@ seguranca/
 │   ├── api/                  ← REST/GraphQL/gRPC/tRPC
 │   └── runtime/              ← Bun, Deno, Hono
 ├── mobile/                   ← 16 ficheiros MASVS-aligned
-├── outras-areas/             ← Containers, IaC, Cloud, CI/CD, ML, Web3, IoT, Privacidade
+├── desktop/                  ← Electron, Tauri, Wails
+├── extensions/               ← Browser extensions (Manifest v3)
+├── outras-areas/             ← Containers, IaC, Cloud, Service mesh, DNS, Email, Wasm, PWA,
+│                                Multi-tenant SaaS, LLM agents, Games, Post-quantum crypto,
+│                                ML, Web3, IoT, Privacidade/Compliance
 ├── examples/                 ← 5 exemplos de auditorias completas
 ├── relatorio/                ← templates de output (score, template, checklist)
 ├── commands/                 ← slash commands opcionais (/audita, /audita-rapido, /audita-diff)
