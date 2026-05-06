@@ -9,9 +9,9 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![PT](https://img.shields.io/badge/lang-pt--PT-green)]()
 
-> **Skill nativa do Claude Code** para auditoria de segurança defensiva pré-entrega — qualquer linguagem, framework, plataforma. Pensa como atacante, age como defensor, devolve fixes copy-paste.
+> **Skill nativa do Claude Code** para auditoria de segurança defensiva pré-entrega — qualquer linguagem, framework, plataforma. Pensa como invasor, age como defensor, devolve fixes copy-paste.
 
-> *"Encontra agora o que um atacante encontrará depois — e mostra como fechar."*
+> *"Encontra agora o que um invasor encontrará depois — e mostra como fechar."*
 
 ## Instalação — 1 comando
 
@@ -45,7 +45,7 @@ Frases equivalentes que ativam a skill:
 ### 24 análises universais (sempre carregadas)
 XSS · SQLi · CSRF · Permissões · REST API · Endpoints públicos · Uploads · Tokens · Exposição de dados · Query Builders/ORMs · Sanitização · Webhooks · Criptografia · Auth/Sessão · Hardening · Headers HTTP · Dependências/supply chain · Business logic/race conditions · Server-side injections (Cmd/LFI/SSTI/Deserialization/XXE) · Open Redirect/SSRF · DoS · Logging · APIs modernas (OAuth/GraphQL/WebSocket) · Email/SMS
 
-> Plus 5 módulos meta: mindset do atacante, attack chains canónicos, técnicas de verificação, patterns de deteção, falsos positivos comuns.
+> Plus 5 módulos meta: mindset do invasor, attack chains canónicos, técnicas de verificação, patterns de deteção, falsos positivos comuns.
 
 ### 18 linguagens
 JavaScript/TypeScript · Python · PHP · Java · C#/.NET · Go · Ruby · Rust · Kotlin · Swift · Dart · C/C++ · Scala · Elixir · Shell/Bash · SQL · GraphQL · Solidity
