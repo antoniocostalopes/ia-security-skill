@@ -1,497 +1,266 @@
-# Como Usar — IA Security Skill
+# Usar a IA Security Skill no Claude Code
 
-Guia completo de uso para developers. Cobre desde a primeira invocação até cenários avançados.
-
-> **Para instalação**, ver [INSTALL.md](INSTALL.md).
-> **Para exemplos completos** input → output, ver [examples/](examples/).
+Guia prático para developers que já têm Claude Code instalado e querem fazer auditoria de segurança defensiva ao seu código antes do deploy.
 
 ---
 
 ## Quick start (60 segundos)
 
-Após [instalares](INSTALL.md) o adaptador da tua IA:
+```bash
+# 1. Instalar (uma vez)
+git clone https://github.com/antoniocostalopes/ia-security-skill ~/.claude/skills/seguranca
 
+# 2. Usar (em qualquer projeto)
+cd ~/projetos/o-meu-projeto
+claude
+> audita este projeto
 ```
-1. Abre o teu projeto
-2. Diz à IA: "audita este projeto"
-3. Recebes relatório em 30s com score + achados + fixes copy-paste
-4. Aplica os fixes (manual ou pede à IA)
-5. Re-corre: "audita de novo" → score sobe
-6. Deploy com confiança
-```
+
+Pronto. Em ~30 segundos tens um relatório Markdown completo.
 
 ---
 
-## Invocação por cliente
+## Como invocar a skill
 
-### Claude Code (CLI)
+O Claude Code lê o frontmatter de [`SKILL.md`](SKILL.md) e ativa a skill quando o teu prompt bate com a descrição. Estes prompts funcionam:
 
-Após `git clone https://github.com/antoniocostalopes/ia-security-skill ~/.claude/skills/seguranca`:
+| Quando queres | Diz |
+|---|---|
+| Auditoria completa do projeto | `audita este projeto` |
+| Security review do diretório atual | `faz security review aqui` |
+| Auditar 1 ficheiro/pasta específico | `audita src/auth/` |
+| Auditar antes de commit | `audita as alterações que vou commitar` |
+| Auditar PR/diff | `audita o diff vs main` |
+| Triagem rápida (só Críticos/Altos) | `triagem rápida — só críticos e altos` |
+| Re-auditoria depois de fix | `audita de novo e mostra o que mudou` |
+| Aplicar fixes do relatório | `aplica os fixes Críticos` |
 
-Dentro de qualquer projeto, escreve no chat:
-```
-audita este projeto
-```
-
-Variantes que funcionam:
-- `faz security review`
-- `verifica vulnerabilidades`
-- `audita o ficheiro server.js`
-- `triagem rápida de segurança` (modo curto)
-
-### Cursor / Windsurf
-
-Após copiar `.cursorrules` ou `.cursor/rules/seguranca.mdc` para o projeto:
-
-`Cmd+L` (Mac) ou `Ctrl+L` (Win) → escreve:
-```
-audit
-```
-
-ou:
-```
-@audit este código
-```
-
-### ChatGPT (Custom GPT)
-
-Após criar Custom GPT com `PROMPT-COMPACTO.md` em Instructions e bundle em Knowledge:
-
-No chat do Custom GPT, cola código ou anexa ficheiros e escreve:
-```
-audita este código
-```
-
-### GitHub Copilot Chat
-
-Após copiar `PROMPT-COMPACTO.md` para `.github/copilot-instructions.md`:
-
-No chat do Copilot (VS Code/JetBrains), com o ficheiro aberto:
-```
-@workspace audita este projeto
-```
-
-### Gemini / DeepSeek / Mistral / outros
-
-1. Cola `PROMPT.md` inteiro como primeira mensagem
-2. Em seguida, cola código a auditar
-3. Pede:
-```
-audita este código aplicando a skill
-```
-
-### CLI standalone (`iass`)
-
-Após setup do `cli-wrapper.sh`:
-
-```bash
-# Auditoria standard de um ficheiro
-iass server.js
-
-# Triagem rápida (só Críticos/Altos)
-iass --quick app.py
-
-# Auditar git diff atual (staged + unstaged)
-iass --diff
-
-# Auditar branch vs origin/main (típico para PRs locais)
-iass --pr
-
-# Gravar relatório em ficheiro
-iass --output audit-report.md src/
-
-# Auditar diretório inteiro
-iass src/
-```
+A skill também ativa quando dizes coisas como *"vê se isto tem vulnerabilidades"*, *"isto está seguro?"*, *"que problemas de segurança tem este código?"*.
 
 ---
 
 ## O que acontece nos bastidores
 
-Quando dizes "audita este projeto", a IA executa um workflow estruturado de 8 fases:
+### Fase 1 — Reconhecimento
+O Claude Code lê manifests (`package.json`, `composer.json`, `requirements.txt`, `pyproject.toml`, `Gemfile`, `go.mod`, `pom.xml`, `*.csproj`, `mix.exs`, `Cargo.toml`, `Info.plist`, `AndroidManifest.xml`, `pubspec.yaml`, `Dockerfile`, `*.tf`, `*.sol`, etc.) para detetar:
+- Linguagens dominantes
+- Frameworks específicos
+- Plataforma (web/mobile/cloud/IaC/web3)
 
-```
-┌─ Fase 1: Recon ────────────────────────────────────────
-│  Lê manifests (package.json, composer.json, Cargo.toml,
-│  Info.plist, AndroidManifest.xml, *.tf, *.sol, etc.)
-│  → Deteta linguagens + frameworks + plataforma
-│
-├─ Fase 2: Carrega contexto (~30-50 ficheiros) ──────────
-│  Sempre: analises/* (24 análises + meta files)
-│  Per stack: linguagens/<lang>.md
-│  Per framework: frameworks/<framework>.md
-│  Se mobile: mobile/* (MASVS)
-│  Se cloud/IaC/etc: outras-areas/<area>.md
-│
-├─ Fase 3: Análise universal (24 categorias) ────────────
-│  Para cada categoria, 3 lentes:
-│  1. Pattern matching (regex/keywords concretos)
-│  2. Análise contextual (entender o flow)
-│  3. Filter false positives (anti-hallucination)
-│
-├─ Fase 4: Análise específica (linguagem + framework) ───
-│  Aplica antipatterns próprios do stack detetado
-│
-├─ Fase 5: Attack chains (mínimo 3) ─────────────────────
-│  Cruza achados procurando combinações que escalam
-│  severidade (ex.: enum + sem rate limit + msg distintas
-│  → password spray)
-│
-├─ Fase 6: Self-review pass ─────────────────────────────
-│  Para cada achado:
-│  - Aplica filtro de falsos positivos
-│  - Atribui confidence (95% / 80% / 60% / 40%)
-│  - < 70% → reduz para "Suspeita"
-│
-├─ Fase 7: Gera relatório ────────────────────────────────
-│  Markdown único no formato fixo do template
-│
-└─ Fase 8: Anexa checklist pré-produção ─────────────────
-```
+### Fase 2 — Análise universal
+Aplica as **24 categorias** de [`analises/`](analises/) a qualquer projeto: XSS, SQLi, CSRF, permissões, REST API, uploads, tokens, exposição, criptografia, auth, hardening, headers, dependências, business logic, server-side injections, SSRF, DoS, logging, APIs modernas, email/SMS.
 
-Tudo isto demora **20-60 segundos** consoante o tamanho do projeto e o modelo IA.
+### Fase 3 — Análise específica
+Carrega só os ficheiros de [`linguagens/`](linguagens/) e [`frameworks/`](frameworks/) que correspondem ao stack detetado. Tipicamente 2-5 ficheiros, não 52.
+
+### Fase 4 — Attack chains (mínimo 3)
+Cruza achados procurando combinações que escalam severidade. Ex: *XSS armazenado + admin sem 2FA + cookies sem `HttpOnly` = ATO completo*.
+
+### Fase 5 — Self-review com confidence
+Re-avalia cada achado com pergunta *"isto é exploit real ou pattern match?"*. Atribui confidence:
+- **95%** — verificado, exploração confirmada
+- **80%** — alta confiança, contexto típico
+- **60%** — provável, requer verificação manual
+- **40%** — suspeita, pode ser falso positivo
+
+Achados <40% são descartados. Ver [`analises/00-falsos-positivos-comuns.md`](analises/00-falsos-positivos-comuns.md).
+
+### Fase 6 — Score & blindagem
+Aplica fórmula de [`relatorio/score-blindagem.md`](relatorio/score-blindagem.md):
+- **0-30** Crítico
+- **31-50** Vulnerável
+- **51-70** Aceitável
+- **71-85** Sólido
+- **86-100** Blindado
+
+### Fase 7 — Relatório
+Markdown único usando o template fixo em [`relatorio/template.md`](relatorio/template.md), anexa [`relatorio/checklist-producao.md`](relatorio/checklist-producao.md).
 
 ---
 
-## O que recebes — anatomia do relatório
+## Anatomia do relatório
 
-Markdown único com **10 secções obrigatórias na mesma ordem**:
+Todo o output segue esta estrutura (10 secções):
 
-### 1. Header
-Nome do projeto, data, stack detetado, ficheiros analisados.
+```markdown
+# Auditoria de Segurança — <projeto>
+> Data · Stack · Auditor
 
-### 2. Score 0-100 + Nível de blindagem
+## 1. Score
+**62/100 — Aceitável (mas com 3 Críticos a fechar antes do deploy)**
 
+## 2. Resumo executivo (cliente)
+3 parágrafos em linguagem clara, sem jargão.
+
+## 3. Resumo técnico
+Lista bullet por categoria com counts.
+
+## 4. Mapa de superfícies de ataque
+- Entry points HTTP / API / WebSocket
+- Trust boundaries
+- Dados sensíveis (PII, tokens, secrets)
+
+## 5. Attack chains (mínimo 3)
+Chain #1: <vetor inicial> → <escalação> → <impacto final>
+
+## 6. Achados detalhados
+### CRÍTICO #1 — SQL Injection em /api/users [confidence 95%]
+- Localização: src/routes/users.js:42
+- Código vulnerável: ...
+- Exploração: ...
+- Correção (copy-paste): ...
+
+## 7. Plano de correção em 4 fases
+- Fase 1 (HOJE): Críticos
+- Fase 2 (esta semana): Altos
+- Fase 3 (este sprint): Médios
+- Fase 4 (hardening): Baixos
+
+## 8. Checklist pré-produção
+- [ ] Headers HTTP (CSP, HSTS, X-Frame-Options)
+- [ ] Auth/sessão (...)
+- [ ] ...
+
+## 9. Recomendações estratégicas
+Próximos passos para subir maturidade.
+
+## 10. Notas e limitações
+O que a skill não verificou (ex: pentest live, runtime).
 ```
-Score: 73/100
-[██████████████░░░░░░] 73%
-Nível: Aceitável (corrige antes de produção)
-```
-
-| Score | Nível | Ação |
-|---|---|---|
-| 90-100 | **Blindado** | Pode publicar |
-| 76-89 | **Sólido** | Correções menores |
-| 61-75 | **Aceitável** | Corrigir antes de prod |
-| 41-60 | **Vulnerável** | Bloquear deploy |
-| 21-40 | **Frágil** | Refactor segurança |
-| 0-20 | **Crítico** | **NÃO PUBLICAR** |
-
-### 3. Resumo para Cliente
-3-5 frases não-técnicas. Ex.: *"A app está bem na maior parte. Tens 2 problemas críticos que dão acesso a contas de outros utilizadores. Em meio dia ficas blindado para deploy."*
-
-### 4. Resumo Técnico
-5-10 linhas para devs com padrões problemáticos, áreas frágeis, dívida.
-
-### 5. Mapa de Superfícies de Ataque
-Tabela com endpoints, auth, exposição, risco.
-
-### 6. Vetores Prováveis com Attack Chains
-Mínimo 3 cenários de exploração realistas combinando achados.
-
-### 7. Achados Detalhados
-Cada um com:
-- **Categoria** (uma das 24)
-- **Severidade** (Crítico/Alto/Médio/Baixo)
-- **Confiança** (95% / 80% / 60%) — após self-review
-- **Localização** `ficheiro:linha`
-- **Código vulnerável** (trecho)
-- **Explicação** (porquê)
-- **Exploração** (PoC realista)
-- **Correção** (código copy-paste)
-
-### 8. Plano de Correção em 4 Fases
-- **Fase 1 — 24-48h** (BLOQUEIA DEPLOY): críticos
-- **Fase 2 — 1 semana**: altos
-- **Fase 3 — 2-4 semanas**: médios
-- **Fase 4 — Hardening contínuo**: baixos + boas práticas
-
-### 9. Checklist Final Pré-Produção
-80+ itens checkbox por categoria (inputs, auth, headers, deps, operacional).
-
-### 10. Recomendações Adicionais
-Tools, deps a atualizar, próxima auditoria.
 
 ---
 
-## Aplicar os fixes
+## Aplicar fixes
 
-### Manual (típico)
-1. Abre o ficheiro indicado em "Localização"
-2. Copia "Correção" do relatório
-3. Substitui o código vulnerável
-4. Repete para próximo achado
+Depois do relatório, podes:
 
-### IA aplica (mais rápido)
-Após o relatório, escreve:
+**Manual:** copiar o bloco "Correção" de cada achado e colar no ficheiro.
+
+**Automático via Claude Code:**
 ```
 aplica os fixes Críticos
 ```
+ou
+```
+aplica todos os fixes do relatório, mostra-me o diff antes de gravar
+```
 
-A IA gera diffs prontos. Aceitas/rejeitas cada um.
-
-Variantes:
-- `aplica os fixes Críticos e Altos`
-- `aplica fix do achado C1`
-- `gera PR com todos os fixes`
+A skill segue as correções tal como propostas. Para fixes complexos pede revisão antes de aplicar.
 
 ---
 
-## Iteração — re-auditoria
+## Re-auditoria / iteração
 
-Após aplicar fixes, valida:
-```
-audita de novo
-```
+Depois de aplicar fixes:
 
-Esperar:
 ```
-Score: 88/100  (era 64)
-Nível: Sólido (era Aceitável)
-✓ C1 (SQL Injection) — RESOLVIDO
-✓ A1 (Rate limit) — RESOLVIDO
-✓ A2 (Tokens HttpOnly) — RESOLVIDO
-○ M3 — ainda presente (médio, opcional)
+audita de novo e compara com o relatório anterior
 ```
 
-Marcas o checklist final, fazes push.
+O Claude Code reexecuta o workflow e mostra:
+- Score antes / depois
+- Achados resolvidos
+- Achados que persistem
+- Novos achados introduzidos pelos fixes (raro mas acontece)
+
+Iterar até score >85 ou Críticos = 0.
 
 ---
 
-## Cenários típicos
+## 5 cenários típicos
 
-### Cenário 1 — Pré-deploy (developer solo)
-
-Workflow no fim de cada feature, antes de `git push`:
+### 1. Pre-deploy de feature nova
 ```
-1. Acabar feature
-2. "audita este projeto antes do deploy"
-3. Aplicar Críticos
-4. Re-auditar
-5. Score ≥ 76 (Sólido) → deploy
+audita src/checkout/ — vou fazer deploy esta tarde
 ```
+Skill foca em superfícies novas, attack chains que cruzam código novo + existente.
 
-**Frequência:** ~1x por feature
-**Tempo:** ~5-10 min total
-
-### Cenário 2 — Code review de PR (team lead)
-
-Em vez de leitura manual de PR:
+### 2. Code review em PR
 ```
-1. Checkout da branch do PR
-2. "audita as mudanças vs origin/main"
-3. Comentar achados na PR
-4. Approve ou request changes
+audita as alterações vs origin/main
 ```
+Skill lê o diff e audita só o que mudou (mais rápido, menos ruído).
 
-**Frequência:** ~1x por PR
-**Tempo:** ~3-5 min
-
-### Cenário 3 — Triagem rápida (commit time)
-
-Antes de cada commit:
-```bash
-$ git add .
-$ git commit -m "..."
-
-# Pre-commit hook corre automaticamente:
-🛡️  IA Security Skill — auditando 3 ficheiro(s)...
-🚨 Encontrou: 1 Crítico
-   [Crítico] auth.js:18 — SQL Injection
-   💡 Substituir por: db.query('... WHERE id = $1', [id])
-❌ Commit bloqueado.
+### 3. Triagem rápida
 ```
-
-Developer corrige, re-tenta commit.
-
-**Frequência:** automática em cada commit
-**Tempo:** ~5-10s por commit
-
-### Cenário 4 — Audit completo trimestral
-
-Para projetos críticos:
-```bash
-iass src/ --output audit-Q2-2026.md
+triagem rápida — só Críticos e Altos, output curto
 ```
+Lista 1 linha por achado: `[Severidade] ficheiro:linha — descrição + fix em 1 linha`.
 
-Report arquivado para compliance/governance.
-
-**Frequência:** trimestral
-**Tempo:** auditoria 5-15 min + ações
-
-### Cenário 5 — Hybrid Semgrep + IA (máximo recall)
-
-```bash
-~/.iass/integracoes/semgrep-integration.sh ./src
+### 4. Auditoria completa periódica
 ```
-
-Semgrep apanha padrões clássicos rapidamente, IA confirma + adiciona business logic.
-
-**Frequência:** auditorias profundas (releases major)
-**Tempo:** 5-10 min
-
----
-
-## Integrações em CI/CD
-
-### GitHub Actions (audit automático em PRs)
-
-```bash
-# 1. Copiar workflow
-mkdir -p .github/workflows
-cp ~/.iass/integracoes/github-action-pr-audit.yml .github/workflows/security-audit.yml
-
-# 2. Adicionar secret no repo:
-#    Settings → Secrets and variables → Actions → New repository secret
-#    Name: ANTHROPIC_API_KEY
-#    Value: sk-ant-...
-
-# 3. Pronto. Cada PR é auto-auditado, comment publicado, blocking se Críticos.
+audita o projeto todo, completo
 ```
+Workflow completo, todas as 7 fases, relatório longo. Para revisões trimestrais.
 
-### Pre-commit hook (bloqueio local)
-
-```bash
-ln -s ~/.iass/integracoes/pre-commit-hook.sh .git/hooks/pre-commit
-export ANTHROPIC_API_KEY="sk-ant-..."  # adicionar ao ~/.bashrc
-
-# Commits com Críticos ficam bloqueados
+### 5. Hardening proativo
 ```
-
-### CLI em scripts
-
-```bash
-# No teu deploy script:
-iass --quick src/ || { echo "Vulnerabilidades detetadas"; exit 1; }
+o projeto não tem vulnerabilidades críticas mas quero hardening — sugere melhorias
 ```
-
----
-
-## Personas — quem usa e como
-
-### Indie dev / Freelancer
-- **Setup:** Claude Code + skill em `~/.claude/skills/`
-- **Uso:** ad-hoc antes de entregar projeto a cliente
-- **Custo:** ~$0.30 por auditoria (Claude API)
-- **Valor:** evita entregar código vulnerável → menos problemas pós-entrega
-
-### Time pequeno (3-10 devs)
-- **Setup:** pre-commit hook em todos + GitHub Action global
-- **Uso:** automatizado em commits e PRs
-- **Custo:** ~$10-30/mês
-- **Valor:** baseline de segurança sem dev pensar nisso
-
-### Enterprise / Compliance
-- **Setup:** Hybrid Semgrep + IA, audit reports arquivados
-- **Uso:** trimestral + ad-hoc para releases major
-- **Custo:** $50-200/mês (mais auditorias)
-- **Valor:** evidência para auditores SOC 2 / ISO 27001
-
-### Pentester white-box
-- **Setup:** CLI standalone, multi-pass com personas diferentes
-- **Uso:** primeira passagem antes de manual review profundo
-- **Custo:** depende
-- **Valor:** cobertura sistemática de 24 categorias antes de deep dive
-
----
-
-## Diferença vs SAST tradicional
-
-| Aspecto | SAST (Semgrep, Snyk, CodeQL) | IA Security Skill |
-|---|---|---|
-| **Tipo de bug** | Patterns AST/regex conhecidos | Patterns + business logic + chains |
-| **Falsos positivos** | Frequentes mas previsíveis | Variável, mitigado por self-review |
-| **Custom rules** | DSL própria (steep curve) | Markdown (qualquer dev) |
-| **Output** | Lista de findings | Relatório com score + plano + fixes |
-| **Velocidade** | Segundos | 30s-2min |
-| **Custo** | Licença ou compute | Tokens IA (~$0.30/audit) |
-| **Contextual** | Não | Sim (cross-file, business flow) |
-| **Determinístico** | Sim | Não (varia entre invocações) |
-
-**Verdicto típico:** *"Uso ambos. Semgrep no CI para regressões rápidas. Skill para reviews profundos antes de deploys e em PRs grandes."*
+Skill foca em camadas defensivas extra: CSP estrito, rate limiting, defense-in-depth, observabilidade de segurança.
 
 ---
 
 ## Limitações honestas
 
-### A skill NÃO é uma silver bullet
-- Detecção depende do **modelo IA** (Claude 3.5 Sonnet > GPT-4 > Gemini > etc.)
-- **Não é determinística** — mesma input pode dar outputs ligeiramente diferentes
-- **Falsos positivos** existem mesmo com self-review
-- **Falsos negativos** também (vulns muito subtis ou contextuais escapam)
-- **Não substitui pen-test profissional** para apps críticas (banking, health)
+A skill **não** faz:
 
-### Comparação realista de detecção
-```
-Skill v1.1 sozinha:           ~85% recall, ~88% precision
-Skill v1.1 + Semgrep hybrid:  ~95% recall, ~92% precision
-Pen-test profissional:        ~98% recall, ~95% precision
-```
+- **Pentest live** — não envia tráfego para o teu servidor, só lê código
+- **Análise dinâmica / runtime** — não corre o código, não vê comportamento real
+- **SAST com flow analysis profunda** — para isso usa Semgrep, CodeQL, Snyk em paralelo
+- **Compliance auditing formal** — para PCI-DSS/HIPAA/SOC2 contrata auditor certificado
+- **Validação contra threat model do teu negócio** — só vê código, não conhece o teu modelo de ameaça
+- **Deteção de vulnerabilidades em dependências (CVEs)** — usa `npm audit` / `pip-audit` / Dependabot
 
-### Quando NÃO usar a skill
-- ❌ Pentest contra sistemas live ou de terceiros (sem autorização)
-- ❌ Compliance auditing formal (SOC 2 audit) — usa ferramenta dedicada (Vanta, Drata)
-- ❌ Resposta a incidente já ocorrido (usa SIEM, forense)
-- ❌ Substituir audit profissional para apps críticas
+A skill **complementa** estas ferramentas, não substitui.
 
-### Quando usar
-- ✅ Pre-deploy review do teu código
-- ✅ Code review de PRs
-- ✅ Triagem rápida em commit time
-- ✅ Onboarding de developer junior em práticas seguras
-- ✅ Primeiro filtro antes de pen-test profissional
+### Falsos positivos / falsos negativos
+
+A skill tem self-review pass mas pode ainda:
+- Reportar XSS num campo que afinal está sanitizado a montante (FP)
+- Não detetar vulnerabilidade lógica de negócio que requer entender intenção (FN)
+
+Trata o relatório como **ponto de partida da revisão**, não verdade absoluta. Confidence scores ajudam a priorizar.
 
 ---
 
 ## FAQ rápido
 
-**Q: Funciona offline?**
-A: Não. Precisa de IA (Claude/GPT/etc.) que usa API.
+**P: Tenho de copiar ficheiros para os meus projetos?**
+R: Não. Instalas uma vez em `~/.claude/skills/seguranca/` e funciona em qualquer projeto.
 
-**Q: Funciona com modelos locais (Ollama, LM Studio)?**
-A: Tecnicamente sim — colas o PROMPT.md como system prompt. Qualidade depende do modelo. Llama 3.1 70B+ é razoável; modelos < 7B falham.
+**P: A skill envia o meu código para algum servidor?**
+R: Só para o Claude Code (Anthropic), tal como qualquer outra interação. A skill em si é só ficheiros locais.
 
-**Q: Custo típico?**
-A: ~$0.30 por auditoria com Claude 3.5 Sonnet. Triagem rápida ~$0.05.
+**P: Posso usar esta skill em projetos privados/comerciais?**
+R: Sim. MIT license. Vê [LICENSE](LICENSE).
 
-**Q: Suporta a minha linguagem X que não está nos 18?**
-A: Sim — IA aplica conhecimento próprio + as 24 análises universais. Mas sem cartão dedicado, a deteção é menos profunda.
+**P: Funciona em Windows / Mac / Linux?**
+R: Sim. Só requer `git clone` para `~/.claude/skills/seguranca/`. No Windows é `%USERPROFILE%\.claude\skills\seguranca\`.
 
-**Q: Posso usar para auditar código de cliente?**
-A: Sim, com autorização escrita. Skill é defensiva pré-entrega — não é pentest live.
+**P: Como atualizo?**
+R: `cd ~/.claude/skills/seguranca && git pull`.
 
-**Q: Os fixes podem ser auto-aplicados?**
-A: Não automaticamente. IA propõe, tu (ou dev) aprovas. Auto-apply é risco demasiado.
+**P: A skill conhece o framework X?**
+R: Vê [`frameworks/`](frameworks/). Se não lá estiver, pede via issue ou contribui via PR.
 
-**Q: Compliance GDPR/HIPAA/SOC2?**
-A: Skill ajuda detetar issues de privacidade/auth (ver `outras-areas/privacidade-compliance.md`), mas não substitui audit formal.
+**P: Posso desativar análises específicas?**
+R: Sim. No prompt: *"audita mas ignora deteção de DoS — vamos tratar disso depois"*.
 
-**Q: Posso treinar a skill com o meu código?**
-A: Não no sentido tradicional — não há ML training. Mas podes adicionar regras/patterns próprias em `analises/*.md` via PR.
+**P: A skill pesa muito no contexto do Claude Code?**
+R: Não. Carregamento hierárquico — só carrega ficheiros do stack detetado (15-50 ficheiros tipicamente).
+
+**P: Posso usar com Claude Code em CI/CD?**
+R: Sim, via `claude --print` ou `claude --headless` em GitHub Actions. Vê [docs.claude.com/claude-code](https://docs.claude.com/claude-code).
+
+**P: A skill foca em segurança ofensiva?**
+R: **Não.** É 100% defensiva — auditoria pré-entrega de código próprio/autorizado. Rejeita pedidos de pentest contra terceiros.
 
 ---
 
 ## Próximos passos
 
-1. **[Instala](INSTALL.md)** o adaptador da tua IA
-2. **Testa** num projeto teu real (qualquer tamanho)
-3. **Revê** os exemplos em [examples/](examples/) para ver outputs esperados
-4. **Configura** integrações ([integracoes/README.md](integracoes/README.md)) se quiseres automatizar
-5. **Contribui** se descobrires falsos positivos/negativos ([CONTRIBUTING.md](CONTRIBUTING.md))
-
----
-
-## Recursos
-
-- 📦 [INSTALL.md](INSTALL.md) — instalação por plataforma
-- 📚 [examples/](examples/) — input + output reais (Node, Laravel, Django, Flutter, Solidity)
-- ⚙️ [integracoes/](integracoes/) — pre-commit, GH Action, CLI, Semgrep
-- 📖 [analises/](analises/) — 24 análises + metodologia
-- 🌐 [linguagens/](linguagens/) — 18 cartões de linguagem
-- 🏗️ [frameworks/](frameworks/) — 34 framework profiles
-- 📱 [mobile/](mobile/) — track MASVS completo
-- ☁️ [outras-areas/](outras-areas/) — cloud, IaC, ML, Web3, IoT
-- 🤝 [CONTRIBUTING.md](CONTRIBUTING.md) — como contribuir
-- 🔒 [SECURITY.md](SECURITY.md) — reportar vulnerabilidades
-
-> *"Encontra agora o que um atacante encontrará depois — e mostra como fechar."*
+1. Instala: `git clone https://github.com/antoniocostalopes/ia-security-skill ~/.claude/skills/seguranca`
+2. Audita um projeto: `claude` → `audita este projeto`
+3. Vê exemplos: [Node](examples/audit-example-node.md) · [Laravel](examples/audit-example-php-laravel.md) · [Django](examples/audit-example-python-django.md) · [Flutter](examples/audit-example-mobile-flutter.md) · [Solidity](examples/audit-example-web3-solidity.md)
+4. Star o repo se ajudar: [github.com/antoniocostalopes/ia-security-skill](https://github.com/antoniocostalopes/ia-security-skill)

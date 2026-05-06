@@ -1,255 +1,199 @@
-# IA Security Skill — v1.0
+# IA Security Skill — para Claude Code
 
 > *Por António Lopes · Open Source · MIT*
 
 [![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red.svg)](https://github.com/antoniocostalopes/ia-security-skill)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0-blue)]()
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-native-purple)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Cobertura](https://img.shields.io/badge/cobertura-universal-brightgreen)]()
 [![PT](https://img.shields.io/badge/lang-pt--PT-green)]()
 
-> 🌍 **Skill 100% open source** — usa, modifica, partilha. Construída pela comunidade, para a comunidade.
-
-> **Hacker amigável** para **agentes de IA** — auditoria de segurança universal de código em **qualquer linguagem, framework e plataforma**, antes da entrega.
+> **Skill nativa do Claude Code** para auditoria de segurança defensiva pré-entrega — qualquer linguagem, framework, plataforma. Pensa como atacante, age como defensor, devolve fixes copy-paste.
 
 > *"Encontra agora o que um atacante encontrará depois — e mostra como fechar."*
 
+## Instalação — 1 comando
+
+```bash
+git clone https://github.com/antoniocostalopes/ia-security-skill ~/.claude/skills/seguranca
+```
+
+Pronto. **Zero configuração por projeto, zero ficheiros copiados para os teus repos.** O Claude Code deteta a skill automaticamente em qualquer pasta onde corras `claude`.
+
+## Uso — 1 frase
+
+Dentro de qualquer projeto:
+
+```bash
+cd ~/projetos/o-meu-projeto
+claude
+> audita este projeto
+```
+
+Em ~30 segundos recebes um relatório Markdown com score, attack chains, achados detalhados e fixes copy-paste.
+
+Frases equivalentes que ativam a skill:
+- *"audita este projeto"*
+- *"faz security review"*
+- *"audita src/ antes do deploy"*
+- *"vê se este código tem vulnerabilidades"*
+- *"usa a skill seguranca em [path]"*
+
 ## O que cobre
 
-### 24 análises universais (qualquer projeto)
-XSS · SQLi · CSRF · Permissões · REST API · Endpoints públicos · Uploads · Tokens · Exposição de dados · Query Builders/ORMs · Sanitização · Webhooks · Criptografia · Auth/Sessão · Hardening · Headers HTTP · Dependências/supply chain · Business logic/race conditions · Server-side injections (Cmd/LFI/SSTI/Deserialization/XXE) · Open Redirect/SSRF · DoS · Logging · APIs modernas (OAuth/GraphQL/WebSocket/API Top 10) · Email/SMS
+### 24 análises universais (sempre carregadas)
+XSS · SQLi · CSRF · Permissões · REST API · Endpoints públicos · Uploads · Tokens · Exposição de dados · Query Builders/ORMs · Sanitização · Webhooks · Criptografia · Auth/Sessão · Hardening · Headers HTTP · Dependências/supply chain · Business logic/race conditions · Server-side injections (Cmd/LFI/SSTI/Deserialization/XXE) · Open Redirect/SSRF · DoS · Logging · APIs modernas (OAuth/GraphQL/WebSocket) · Email/SMS
 
-> Plus 3 módulos meta: mindset do atacante, attack chains canónicos, técnicas de verificação.
+> Plus 5 módulos meta: mindset do atacante, attack chains canónicos, técnicas de verificação, patterns de deteção, falsos positivos comuns.
 
 ### 18 linguagens
 JavaScript/TypeScript · Python · PHP · Java · C#/.NET · Go · Ruby · Rust · Kotlin · Swift · Dart · C/C++ · Scala · Elixir · Shell/Bash · SQL · GraphQL · Solidity
 
 ### 34 frameworks
 **PHP**: WordPress · Laravel · Symfony
-**Node meta-frameworks**: Express · Fastify · NestJS · Next.js · Nuxt · Remix · SvelteKit · AdonisJS
-**Frontend standalone**: React · Vue 3 · Angular · Astro · HTMX
+**Node**: Express · Fastify · NestJS · Next.js · Nuxt · Remix · SvelteKit · AdonisJS
+**Frontend**: React · Vue 3 · Angular · Astro · HTMX
 **Python**: Django · Flask · FastAPI
 **Java**: Spring Boot · Quarkus
 **.NET**: ASP.NET Core · Blazor
 **Outros**: Rails · Gin/Echo · Phoenix · Actix/Axum
-**Runtimes**: Bun · Deno · Hono (edge)
+**Runtimes**: Bun · Deno · Hono
 **APIs**: REST/OpenAPI · GraphQL/Apollo · gRPC · tRPC
 
-### Track Mobile completo (MASVS-aligned)
+### Track Mobile (MASVS-aligned)
 iOS Native · Android Native · React Native · Flutter · Xamarin/MAUI · Ionic/Cordova/Capacitor + Storage local · Network/Cert pinning · Deep links · WebView · Biometric · Anti-jailbreak/root · Reverse Engineering · Store distribution
 
-### Outras áreas especializadas
-Containers/Kubernetes · IaC (Terraform/CloudFormation) · AWS · GCP · Azure · CI/CD pipelines · ML/AI security · Web3/Smart contracts · IoT/Embedded · **Privacidade/Compliance** (GDPR/LGPD/CCPA/HIPAA/PCI-DSS)
+### Outras áreas
+Containers/Kubernetes · IaC (Terraform/CloudFormation) · AWS · GCP · Azure · CI/CD pipelines · ML/AI security · Web3/Smart contracts · IoT/Embedded · Privacidade/Compliance (GDPR/LGPD/CCPA/HIPAA/PCI-DSS)
 
-## Instalação rápida — escolhe a tua IA
+## Como funciona
 
-A skill funciona em **15+ IAs**. Para qualquer cliente, faz `git clone` primeiro:
+O Claude Code lê o frontmatter de [`SKILL.md`](SKILL.md) e ativa a skill quando o teu pedido bate com a descrição (ex: *"audita"*, *"security review"*, *"vulnerabilidades"*).
 
-```bash
-git clone https://github.com/antoniocostalopes/ia-security-skill
-cd ia-security-skill
-```
+A skill executa um workflow em 7 fases:
 
-Depois, escolhe o ficheiro adaptador adequado à tua IA:
+1. **Reconhecimento** — lê manifests (`package.json`, `composer.json`, `requirements.txt`, `Info.plist`, `Dockerfile`, etc.) para detetar stack
+2. **Análise universal** — 24 categorias aplicadas a qualquer projeto
+3. **Análise específica** — carrega só os ficheiros de [`linguagens/`](linguagens/) e [`frameworks/`](frameworks/) relevantes
+4. **Attack chains** — combina achados (mínimo 3 cadeias) para escalar severidade
+5. **Self-review** — confidence scoring (95%/80%/60%/40%) e filtragem de falsos positivos
+6. **Score & blindagem** — fórmula em [`relatorio/score-blindagem.md`](relatorio/score-blindagem.md)
+7. **Relatório** — template fixo em [`relatorio/template.md`](relatorio/template.md)
 
-| IA | Ficheiro adaptador | Setup |
-|---|---|---|
-| **Aider** | [`examples/configs/aider.conf.yml`](examples/configs/aider.conf.yml) | Copiar para `~/.aider.conf.yml` |
-| **Claude Code** (CLI) | [`SKILL.md`](SKILL.md) | `cp -r . ~/.claude/skills/seguranca/` |
-| **Claude.ai** (Projects) | Toda a pasta | Upload em Project Knowledge |
-| **Continue.dev** | [`examples/configs/continue-config.json`](examples/configs/continue-config.json) | Merge no `~/.continue/config.json` |
-| **Cursor** (legacy) | [`.cursorrules`](.cursorrules) | Copiar para a raiz do projeto |
-| **Cursor** (moderno ≥0.43) | [`.cursor/rules/seguranca.mdc`](.cursor/rules/seguranca.mdc) | Copiar para `.cursor/rules/` no projeto |
-| **GitHub Copilot Chat** | [`PROMPT-COMPACTO.md`](PROMPT-COMPACTO.md) | Copiar para `.github/copilot-instructions.md` |
-| **ChatGPT Custom GPT** | [`PROMPT-COMPACTO.md`](PROMPT-COMPACTO.md) + [`bundles/`](bundles/) | Instructions + 1 bundle (20 files) |
-| **Gemini / DeepSeek / Mistral / Qwen** | [`PROMPT.md`](PROMPT.md) | Colar como system prompt |
-| **Windsurf** / **Codex CLI** | [`AGENTS.md`](AGENTS.md) | Copiar para a raiz do projeto |
-| **Qualquer outra IA** | [`PROMPT-COMPACTO.md`](PROMPT-COMPACTO.md) | Colar como system prompt ou primeira mensagem |
+### Carregamento hierárquico — 3 camadas
 
-**One-liner para Claude Code:**
-```bash
-curl -sSL https://raw.githubusercontent.com/antoniocostalopes/ia-security-skill/main/install.sh | bash
-```
-
-Para instruções detalhadas: **[INSTALL.md](INSTALL.md)**.
-
-## Como usar
-
-Após instalar o adaptador da tua IA:
-
-### 1. Invoca a skill
-
-| Cliente | Comando/frase no chat |
-|---|---|
-| **Claude Code** | `audita este projeto` |
-| **Cursor / Windsurf** | `audit` (Cmd+L) |
-| **ChatGPT Custom GPT** | `audita este código` (cola/anexa código) |
-| **GitHub Copilot Chat** | `@workspace audita este projeto` |
-| **Gemini / DeepSeek / Mistral** | (cola `PROMPT.md` primeiro) → `audita este código:` + código |
-| **CLI standalone** | `iass app.js` ou `iass --diff` ou `iass --pr` |
-
-### 2. Recebes relatório em ~30 segundos
-
-Markdown único com:
-- Score 0-100 + nível de blindagem
-- Mapa de superfícies de ataque
-- Attack chains (mínimo 3)
-- Achados detalhados com **fix copy-paste** + confidence (95%/80%/60%)
-- Plano de correção em 4 fases
-- Checklist pré-produção
-
-### 3. Aplica os fixes
-
-Manual (copia "Correção" do relatório) ou pede à IA:
-```
-aplica os fixes Críticos
-```
-
-### 4. Re-audita para validar
+A IA carrega só o que precisa (não bloat por carregar tudo):
 
 ```
-audita de novo
+1. Universal (sempre)        → analises/      (24 análises + 5 meta)
+2. Linguagem (per stack)     → linguagens/    (1-3 ficheiros)
+3. Framework (per stack)     → frameworks/    (1-3 ficheiros)
++ Mobile (se aplicável)      → mobile/        (até 16 ficheiros MASVS)
++ Outras áreas (se relevante)→ outras-areas/  (containers, IaC, cloud, etc.)
 ```
 
-Score sobe → marcas checklist → push com confiança.
-
-### Exemplo completo
-
-Vê `examples/audit-example-node.md` para input + output reais. Outros stacks: [Laravel](examples/audit-example-php-laravel.md) · [Django](examples/audit-example-python-django.md) · [Flutter](examples/audit-example-mobile-flutter.md) · [Solidity](examples/audit-example-web3-solidity.md).
-
-### Cenários avançados
-
-| Cenário | Como |
-|---|---|
-| **Pre-commit auto-block** | Setup `integracoes/pre-commit-hook.sh` |
-| **Auto-audit em PRs** | Copy `integracoes/github-action-pr-audit.yml` para `.github/workflows/` |
-| **Hybrid Semgrep + IA** (recall máximo) | `~/.iass/integracoes/semgrep-integration.sh ./src` |
-| **CI/CD pipeline** | `iass --quick src/ \|\| exit 1` |
-
-📖 **Para detalhes completos, cenários, FAQ e personas:** **[USAGE.md](USAGE.md)**.
-
-## Arquitetura — 3 camadas hierárquicas
-
-A IA carrega o que precisa para o stack detetado. Não bloat por carregar tudo de uma vez.
-
-```
-1. Universal (sempre)        → analises/      (24 análises + 3 meta: mindset/chains/verificação)
-2. Linguagem (per stack)     → linguagens/    (18 cartões + README)
-3. Framework (per stack)     → frameworks/    (34 profiles + README)
-+ Mobile (se aplicável)      → mobile/        (16 ficheiros MASVS + README)
-+ Outras áreas (se relevante)→ outras-areas/  (10 domínios especializados + README)
-```
+Em runtime: 15-50 ficheiros ativos conforme stack.
 
 ## Output
 
-Relatório visual em Markdown com:
-- Score de segurança 0-100
-- Nível de blindagem (Crítico → Blindado)
-- Mapa de superfícies de ataque
-- Attack chains (mínimo 3 combinações)
-- Resumo executivo (cliente) + Resumo técnico (devs)
-- Plano de correção em 4 fases
-- Checklist final pré-produção
+Relatório Markdown único com:
+
+- **Score 0-100** + nível de blindagem (Crítico → Blindado)
+- **Mapa de superfícies de ataque** (entry points, trust boundaries)
+- **Attack chains** (mínimo 3 cadeias de exploração)
+- **Resumo executivo** (cliente) + **Resumo técnico** (devs)
+- **Achados detalhados** com severidade, ficheiro:linha, código vulnerável, exploração, **fix copy-paste**, confidence
+- **Plano de correção em 4 fases** (Críticos agora → Hardening tarde)
+- **Checklist pré-produção**
+
+Ver exemplos reais:
+- [Node.js / Express](examples/audit-example-node.md)
+- [PHP / Laravel](examples/audit-example-php-laravel.md)
+- [Python / Django](examples/audit-example-python-django.md)
+- [Mobile / Flutter](examples/audit-example-mobile-flutter.md)
+- [Web3 / Solidity](examples/audit-example-web3-solidity.md)
 
 ## Estrutura
 
 ```
 seguranca/
-├── README.md / INSTALL.md / CHANGELOG.md / LICENSE
-├── CONTRIBUTING.md / SECURITY.md     ← guidelines comunidade
-├── PROMPT.md                         ← system prompt universal (canónico)
-├── PROMPT-COMPACTO.md                ← versão <8KB para clientes com limite
-├── SKILL.md                          ← adaptador Claude Code
-├── AGENTS.md                         ← adaptador Cursor / Windsurf / Codex
-├── .cursorrules                      ← adaptador Cursor (legacy)
-├── .cursor/rules/seguranca.mdc       ← adaptador Cursor (moderno ≥0.43)
-├── install.sh
-├── analises/                         ← 24 análises universais + 5 meta (mindset/chains/verificação/patterns/falsos-positivos)
-├── linguagens/                       ← 18 cartões por linguagem
+├── SKILL.md                  ← entry point (frontmatter Claude Code)
+├── README.md / USAGE.md / INSTALL.md
+├── CHANGELOG.md / CONTRIBUTING.md / SECURITY.md / LICENSE
+├── analises/                 ← 24 análises + 5 meta (mindset/chains/verificação/patterns/falsos-positivos)
+├── linguagens/               ← 18 cartões por linguagem
 ├── frameworks/
-│   ├── web/                          ← 27 web frameworks (PHP, Node, Frontend standalone, Python, Java, .NET, Ruby, Go, Elixir, Rust)
-│   ├── api/                          ← REST/OpenAPI, GraphQL/Apollo, gRPC, tRPC
-│   └── runtime/                      ← Bun, Deno, Hono
-├── mobile/                           ← 16 ficheiros MASVS
-├── outras-areas/                     ← Containers, IaC, Cloud (AWS/GCP/Azure), CI/CD, ML, Web3, IoT, Privacidade/Compliance
-├── examples/
-│   ├── audit-example-node.md         ← few-shot Node.js
-│   ├── audit-example-php-laravel.md  ← few-shot Laravel
-│   ├── audit-example-python-django.md ← few-shot Django
-│   ├── audit-example-mobile-flutter.md ← few-shot Flutter (banking)
-│   ├── audit-example-web3-solidity.md ← few-shot Solidity
-│   └── configs/                      ← templates Aider, Continue.dev
-├── integracoes/                      ← pre-commit hook, GH Action, CLI wrapper, Semgrep
-├── bundles/
-│   └── chatgpt-knowledge.md          ← 9 bundles ChatGPT especializados (limit 20 files)
-├── .github/                          ← CI workflows + issue/PR templates
-└── relatorio/                        ← templates do output
+│   ├── web/                  ← 27 web frameworks
+│   ├── api/                  ← REST/GraphQL/gRPC/tRPC
+│   └── runtime/              ← Bun, Deno, Hono
+├── mobile/                   ← 16 ficheiros MASVS-aligned
+├── outras-areas/             ← Containers, IaC, Cloud, CI/CD, ML, Web3, IoT, Privacidade
+├── examples/                 ← 5 exemplos de auditorias completas
+├── relatorio/                ← templates de output (score, template, checklist)
+├── commands/                 ← slash commands opcionais (/audita, /audita-rapido, /audita-diff)
+├── agents/                   ← subagent opcional (auditor-seguranca)
+└── .github/                  ← CI workflows + issue/PR templates
 ```
 
-**Total:** ~135 ficheiros, ~700 KB. Em runtime, IA carrega apenas 30-50 ficheiros conforme stack detetado.
+## Atualizar
+
+```bash
+cd ~/.claude/skills/seguranca && git pull
+```
 
 ## Tom
 
 > *"Aqui qualquer um corre código no teu server. Mau, mas o fix são 3 linhas — vamos a isso."*
 
-Hacker amigável: prestável, direto, honesto. Sem alarmismo teatral. Cada achado tem fix copy-paste.
+Direto, prestável, honesto. Sem alarmismo teatral. Cada achado tem fix copy-paste. Severidade conservadora — falsos positivos minam confiança.
 
 ## Quem é para
 
-- **Developers** a auditar o seu próprio código antes de deploy
-- **Tech leads** a fazer security review pré-merge
-- **Agentes de IA** integrados em CI/CD ou IDE para análise contínua
-- **Pentesters em modo white-box** com acesso ao código
+- **Developers** que usam Claude Code e querem auditar o próprio código antes do deploy
+- **Tech leads** a fazer security review pré-merge dentro do Claude Code
+- **Equipas** que adotaram Claude Code como agente principal e querem segurança como capacidade nativa
 
 ## Quem **não** é para
 
 - Pentesting de sistemas de terceiros sem autorização
-- Compliance auditing formal (use ferramentas dedicadas)
-- Resposta a incidente / forense (use SIEM)
+- Compliance auditing formal (usar ferramentas dedicadas)
+- Resposta a incidente / forense (usar SIEM)
+- Quem **não** usa Claude Code (esta skill é específica do Claude Code; para outras IAs, garfa o repo e adapta)
 
 ## Cobertura OWASP
 
 | OWASP | Cobertura |
 |---|---|
-| OWASP Top 10 (Web 2021) | ✓ 10/10 |
-| OWASP API Security Top 10 (2023) | ✓ 10/10 |
-| OWASP Top 10 LLM (2025) | ✓ via `outras-areas/ml-ai-security.md` |
-| OWASP MASVS (Mobile) | ✓ track mobile completo |
-| OWASP Top 10 IoT | ✓ via `outras-areas/iot-embedded.md` |
+| OWASP Top 10 (Web 2021) | 10/10 |
+| OWASP API Security Top 10 (2023) | 10/10 |
+| OWASP Top 10 LLM (2025) | via [`outras-areas/ml-ai-security.md`](outras-areas/ml-ai-security.md) |
+| OWASP MASVS (Mobile) | track mobile completo |
+| OWASP Top 10 IoT | via [`outras-areas/iot-embedded.md`](outras-areas/iot-embedded.md) |
 
 ## Versão
 
-**v1.1.0** — Detection performance + workflow integration. Adiciona patterns de deteção, anti-hallucination, self-review pass, confidence scoring, 4 examples adicionais (Laravel/Django/Flutter/Solidity), e integrações (pre-commit, GH Action, CLI, Semgrep hybrid).
+**v1.0.0** — Release inicial pública. Skill nativa Claude Code com 24 análises universais, 18 linguagens, 34 frameworks, track mobile MASVS, áreas especializadas, self-review pass, confidence scoring e 5 examples reais.
 
-**v1.0.0** — Release inicial pública.
-
-Ver [CHANGELOG.md](CHANGELOG.md) para detalhes completos.
+Ver [CHANGELOG.md](CHANGELOG.md) para detalhes.
 
 ## Como contribuir
 
-A skill é **open source** e contribuições são bem-vindas:
+Contribuições são bem-vindas:
 
-- 🐛 **Reportar bugs ou falsos positivos** — abrir issue em GitHub
-- 💡 **Sugerir nova categoria/framework/linguagem** — abrir issue com proposta
-- 🔧 **Pull requests** — ver [CONTRIBUTING.md](CONTRIBUTING.md) para guidelines
-- 🛡️ **Reportar vulnerabilidades** na própria skill — ver [SECURITY.md](SECURITY.md)
-- ⭐ **Star o repo** — ajuda outros a descobrir
-- 📢 **Partilhar** — qualquer developer beneficia
+- **Reportar bugs ou falsos positivos** — abrir issue
+- **Sugerir nova categoria/framework/linguagem** — abrir issue com proposta
+- **Pull requests** — ver [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Reportar vulnerabilidades** na própria skill — ver [SECURITY.md](SECURITY.md)
+- **Star o repo** — ajuda outros developers Claude Code a descobrir
 
-## Autor e mantedor
+## Autor
 
 **António Lopes**
 GitHub: [@antoniocostalopes](https://github.com/antoniocostalopes)
 
-Esta skill é mantida abertamente. Discussões, melhorias e novas ideias acontecem em GitHub Issues e Pull Requests.
-
 ## Licença
 
 **MIT** — ver [LICENSE](LICENSE). Copyright © 2026 António Lopes.
-
-✅ **Podes:** usar comercialmente, modificar, distribuir, usar em projetos privados
-✅ **Tens que:** incluir o copyright + licença ao distribuir
-❌ **Não podes:** responsabilizar o autor (sem garantia)
 
 Uso destinado a **auditoria defensiva pré-entrega** de código próprio ou autorizado. Não usar para testar sistemas de terceiros sem autorização.

@@ -39,16 +39,6 @@ jobs:
           fi
           echo "✓ SKILL.md frontmatter válido"
 
-      - name: Check PROMPT-COMPACTO size (ChatGPT 8000 char limit)
-        run: |
-          size=$(wc -c < PROMPT-COMPACTO.md)
-          echo "PROMPT-COMPACTO.md: $size bytes"
-          if [ "$size" -gt 8000 ]; then
-            echo "::error::PROMPT-COMPACTO.md excede 8000 chars ($size). Não cabe em ChatGPT Custom GPT Instructions."
-            exit 1
-          fi
-          echo "✓ PROMPT-COMPACTO.md dentro do limite (folga: $((8000 - size)) chars)"
-
       - name: Check for broken cross-references
         run: |
           broken=0

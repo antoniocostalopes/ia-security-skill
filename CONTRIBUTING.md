@@ -11,7 +11,7 @@ Abre uma **issue** no GitHub descrevendo:
 - Categoria afetada (ex.: `analises/sql-injection.md`)
 - Comportamento atual vs esperado
 - Exemplo de código onde a IA deu falso positivo / falso negativo
-- IA usada (Claude, ChatGPT, Cursor, etc.) e versão
+- Versão do Claude Code (`claude --version`)
 
 ### 💡 Sugerir nova categoria / framework / linguagem
 Abre uma **issue** com:
@@ -58,14 +58,14 @@ git checkout -b feature/nova-analise-X
 
 #### Diretrizes de tom
 
-- **Hacker amigável**: prestável, direto, honesto. Sem alarmismo.
+- **Tom prestável**: direto, honesto, sem alarmismo teatral.
 - **Output construtivo**: cada problema tem fix copy-paste
 - **Severidade conservadora**: Crítico só para o que é crítico
 - **Português pt-PT** por defeito (PRs em outras línguas requerem discussão)
 
 #### Antes de submeter PR
 
-- [ ] Conteúdo segue tom "hacker amigável"
+- [ ] Conteúdo segue tom prestável (sem alarmismo)
 - [ ] Code examples testados (sintaxe correta)
 - [ ] Quick wins com 8-10 itens checkbox
 - [ ] Cross-references válidas (sem broken links)
@@ -75,9 +75,6 @@ git checkout -b feature/nova-analise-X
 
 ### 📚 Documentação
 Correções tipográficas, clarificações, traduções de exemplos — todas bem-vindas via PR direto.
-
-### 🎨 Bundles ChatGPT
-Se o teu uso não cabe nos 9 bundles existentes em `bundles/chatgpt-knowledge.md`, propõe um novo bundle com a tua combinação de 20 ficheiros.
 
 ## Processo de review
 
@@ -91,11 +88,12 @@ Se o teu uso não cabe nos 9 bundles existentes em `bundles/chatgpt-knowledge.md
 
 Antes de propor alterações grandes, lê estes princípios:
 
-1. **Universal-first** — qualquer linguagem/framework/plataforma. WordPress é uma das opções, não a default.
-2. **Hacker amigável, não auditor** — tom de colega, não de inspetor.
-3. **Cada achado tem fix copy-paste** — apontar sem corrigir não chega.
-4. **Severidade conservadora** — falsos positivos minam confiança.
-5. **AI-friendly** — estrutura previsível, cross-references claras, loading hierárquico.
+1. **Claude Code-first** — skill nativa do Claude Code, sem adaptadores multi-IA. Para outras IAs, garfa o repo.
+2. **Universal stack** — qualquer linguagem/framework/plataforma. WordPress é uma das opções, não a default.
+3. **Tom prestável** — colega que ajuda, não inspetor que aponta erros.
+4. **Cada achado tem fix copy-paste** — apontar sem corrigir não chega.
+5. **Severidade conservadora** — falsos positivos minam confiança.
+6. **Loading hierárquico** — só carregar ficheiros relevantes ao stack detetado.
 
 Mudanças que conflitem com estes princípios serão discutidas mais cuidadosamente.
 

@@ -1,3 +1,5 @@
+# Pull Request
+
 ## Descrição
 
 (Resume o que este PR faz)
@@ -18,14 +20,14 @@
 - [ ] `frameworks/*.md`
 - [ ] `mobile/*.md`
 - [ ] `outras-areas/*.md`
-- [ ] Entry points (SKILL.md, PROMPT.md, AGENTS.md, etc.)
+- [ ] Entry point (`SKILL.md`)
 - [ ] CI / configs
 - [ ] Outro: ____
 
 ## Checklist
 
 ### Conteúdo
-- [ ] Segue tom **hacker amigável** (prestável, direto, sem alarmismo)
+- [ ] Segue tom prestável (direto, honesto, sem alarmismo)
 - [ ] Code examples têm BAD vs GOOD claramente marcados
 - [ ] Sintaxe dos snippets testada (não inventei API calls)
 - [ ] Multi-linguagem onde aplicável
@@ -54,7 +56,6 @@
 
 ### CI
 - [ ] CI passou localmente (cross-refs, lint, sizes)
-- [ ] PROMPT-COMPACTO.md continua < 8000 chars (se editado)
 
 ## Como testar
 

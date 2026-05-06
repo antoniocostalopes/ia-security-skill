@@ -1,130 +1,117 @@
-# Instalação — IA Security Skill v1.0
+# Instalação — IA Security Skill (Claude Code)
 
-A skill funciona em qualquer IA. Escolhe a tua plataforma.
+A skill é nativa do Claude Code. Instalas uma vez globalmente e fica disponível em qualquer projeto onde corras `claude`.
 
-## Claude Code (CLI)
+---
 
-**Global** (todos os projetos):
+## Pré-requisitos
+
+- **Claude Code** instalado e configurado ([docs.claude.com/claude-code](https://docs.claude.com/claude-code))
+- **Git** disponível na PATH
+
+---
+
+## Instalação global (recomendada)
+
+Disponível em todos os projetos onde uses Claude Code:
+
+### macOS / Linux
+
 ```bash
 git clone https://github.com/antoniocostalopes/ia-security-skill ~/.claude/skills/seguranca
 ```
 
-**Por projeto:**
+### Windows (PowerShell)
+
+```powershell
+git clone https://github.com/antoniocostalopes/ia-security-skill "$env:USERPROFILE\.claude\skills\seguranca"
+```
+
+### Windows (Git Bash / WSL)
+
 ```bash
+git clone https://github.com/antoniocostalopes/ia-security-skill ~/.claude/skills/seguranca
+```
+
+Pronto. **Zero configuração adicional.** O Claude Code deteta automaticamente a skill via o frontmatter de [`SKILL.md`](SKILL.md).
+
+---
+
+## Instalação por projeto (opcional)
+
+Se preferires versionar a skill com um projeto específico (ex: para a equipa toda usar a mesma versão):
+
+```bash
+cd ~/projetos/o-meu-projeto
 git clone https://github.com/antoniocostalopes/ia-security-skill .claude/skills/seguranca
 ```
 
-**Uso:** dentro de qualquer projeto, pede *"audita este projeto"* / *"faz security review"*.
-
-A IA deteta o stack automaticamente e carrega só o contexto relevante (15-25 ficheiros).
-
----
-
-## Claude.ai (browser, Projects)
-
-1. Descarrega ZIP / `git clone`
-2. Em **claude.ai** → cria **Project** ("Auditoria de Segurança")
-3. **Project knowledge:** upload da pasta inteira (suporta muitos ficheiros)
-4. **Custom instructions:** Persona + Workflow do `PROMPT.md`
-
----
-
-## ChatGPT Custom GPT
-
-ChatGPT limita Knowledge a **20 ficheiros**. Como a skill total tem ~112, criámos **bundles especializados**.
-
-1. **Explore GPTs** → **+ Create**
-2. **Configure:**
-   - **Name:** Auditoria de Segurança Universal
-   - **Description:** Hacker amigável que ajuda a blindar código antes da entrega
-   - **Instructions:** colar **`PROMPT-COMPACTO.md`** (5811 chars)
-   - **Knowledge:** seguir um dos bundles em **[`bundles/chatgpt-knowledge.md`](bundles/chatgpt-knowledge.md)**:
-     - **Universal Web** (default, recomendado)
-     - **Mobile** (iOS, Android, RN, Flutter, MASVS)
-     - **Cloud / DevOps** (containers, IaC, AWS/GCP/Azure, CI/CD)
-     - **Node Full-Stack** (Express/Next/Nest)
-     - **Python Full-Stack** (Django/Flask/FastAPI)
-     - **PHP/WordPress/Laravel**
-     - **Web3 / Smart Contracts**
-3. **Capabilities:** desligar Web Browse / DALL·E
-4. **Save** → partilhar link
-
----
-
-## Cursor / Windsurf
-
-```bash
-git clone https://github.com/antoniocostalopes/ia-security-skill /tmp/skill
-cp /tmp/skill/AGENTS.md ./AGENTS.md
-cp -r /tmp/skill/{analises,linguagens,frameworks,mobile,outras-areas,relatorio} .cursor/
+E adiciona ao `.gitignore` se não quiseres comitar:
+```
+.claude/skills/seguranca/
 ```
 
-`AGENTS.md` é detetado automaticamente em Cursor 0.43+.
-
----
-
-## GitHub Copilot
-
-```bash
-mkdir -p .github
-curl -sSL https://raw.githubusercontent.com/antoniocostalopes/ia-security-skill/main/PROMPT-COMPACTO.md \
-  -o .github/copilot-instructions.md
-```
-
----
-
-## Gemini / DeepSeek / Mistral / generic LLM
-
-`PROMPT.md` (versão completa) ou `PROMPT-COMPACTO.md` (versão tight).
-
-1. Cola como system prompt ou primeira mensagem
-2. Cola código para auditar
-3. Pede análise
-
----
-
-## Aider
-
-```bash
-git clone https://github.com/antoniocostalopes/ia-security-skill /tmp/skill
-aider --read /tmp/skill/PROMPT.md \
-      --read /tmp/skill/analises/*.md
-```
-
----
-
-## Continue (VS Code)
-
-`~/.continue/config.json` → `systemMessage` com conteúdo de `PROMPT-COMPACTO.md`.
+Ou comita normalmente para fixar a versão para a equipa.
 
 ---
 
 ## Verificação
 
-Em qualquer cliente:
+Em qualquer projeto:
 
-> *"Qual é o lema desta skill?"*
+```bash
+claude
+> qual é o lema da skill seguranca?
+```
 
 Resposta esperada:
 > *"Encontra agora o que um atacante encontrará depois — e mostra como fechar."*
 
-> *"Quantas linguagens cobre?"*
+Se o Claude Code disser que não conhece a skill, verifica:
 
-Resposta esperada:
-> *"18 — JavaScript/TypeScript, Python, PHP, Java, C#/.NET, Go, Ruby, Rust, Kotlin, Swift, Dart, C/C++, Scala, Elixir, Shell/Bash, SQL, GraphQL, Solidity"*
+```bash
+ls ~/.claude/skills/seguranca/SKILL.md
+```
+
+O ficheiro deve existir.
 
 ---
 
-## Troubleshooting
+## Primeira auditoria
 
-| Sintoma | Causa | Solução |
-|---|---|---|
-| Claude Code não ativa skill | Pasta no sítio errado | Confirma `~/.claude/skills/seguranca/SKILL.md` existe |
-| ChatGPT corta prompt | Usaste `PROMPT.md` em Instructions | Usa `PROMPT-COMPACTO.md` (5800 chars) |
-| Cursor ignora AGENTS.md | Versão antiga | Atualiza Cursor 0.43+ |
-| Análise superficial | Stack não detetado | Verifica que `linguagens/` e `frameworks/` estão acessíveis |
-| Mobile não analisado | `mobile/` não carregado | Confirma que pasta `mobile/` está na Knowledge ou filesystem |
-| Falsos positivos altos | Skill não conhece o framework | Pede para ler o profile específico do framework |
+```bash
+cd ~/projetos/qualquer-projeto
+claude
+> audita este projeto
+```
+
+Em ~30 segundos recebes um relatório Markdown com score, attack chains, achados e fixes. Ver [USAGE.md](USAGE.md) para detalhes.
+
+---
+
+## Extras opcionais
+
+### Slash commands `/audita*`
+
+Atalhos `/audita`, `/audita-rapido`, `/audita-diff` para invocação determinística:
+
+```bash
+mkdir -p ~/.claude/commands
+cp ~/.claude/skills/seguranca/commands/audita*.md ~/.claude/commands/
+```
+
+Detalhes em [`commands/README.md`](commands/README.md).
+
+### Subagent `auditor-seguranca`
+
+Para workflows compostos (audit → apply fixes → re-audit) ou proteger contexto principal:
+
+```bash
+mkdir -p ~/.claude/agents
+cp ~/.claude/skills/seguranca/agents/auditor-seguranca.md ~/.claude/agents/
+```
+
+Detalhes em [`agents/README.md`](agents/README.md).
 
 ---
 
@@ -134,4 +121,38 @@ Resposta esperada:
 cd ~/.claude/skills/seguranca && git pull
 ```
 
-Ou re-correr `install.sh`.
+Releases novos saem como tags `v1.x.x`. Para fixar uma versão específica:
+
+```bash
+cd ~/.claude/skills/seguranca && git checkout v1.0.0
+```
+
+---
+
+## Desinstalar
+
+```bash
+rm -rf ~/.claude/skills/seguranca
+```
+
+(Windows: `Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\skills\seguranca"`)
+
+---
+
+## Troubleshooting
+
+| Sintoma | Causa | Solução |
+|---|---|---|
+| Claude Code não ativa a skill | Pasta no sítio errado | Confirma `~/.claude/skills/seguranca/SKILL.md` existe |
+| Skill ativa mas análise superficial | Stack não detetado | Verifica que tens manifests (`package.json`, etc.) na raiz do projeto |
+| Falsos positivos altos | Framework não conhecido | Pede `audita usando o profile X` ou contribui com novo profile via PR |
+| Mobile não analisado | Sem manifests mobile | Confirma `Info.plist` / `AndroidManifest.xml` / `pubspec.yaml` presentes |
+| `git clone` falha em Windows com path longo | Limite de 260 chars | `git config --global core.longpaths true` |
+
+---
+
+## Notas
+
+- Esta skill é **específica do Claude Code**. Para outras IAs (Cursor, ChatGPT, Copilot, etc.), garfa o repo e adapta — contribuições back via PR são bem-vindas.
+- A skill **não** envia o teu código para nenhum servidor externo. É só ficheiros Markdown locais que o Claude Code carrega no contexto da conversa.
+- Ver [SECURITY.md](SECURITY.md) para reportar vulnerabilidades na própria skill.
