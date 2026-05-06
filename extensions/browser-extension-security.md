@@ -238,7 +238,7 @@ Mais seguro que webRequest porque rules são declarativas (não código arbitrá
 - [`../analises/xss.md`](../analises/xss.md) — XSS aplicável a popup/options pages
 - [`../analises/16-headers-http.md`](../analises/16-headers-http.md) — CSP geral
 - [`../linguagens/javascript-typescript.md`](../linguagens/javascript-typescript.md) — JS pitfalls
-- [`../analises/8-tokens.md`](../analises/tokens.md) — armazenamento de tokens
+- [`../analises/tokens.md`](../analises/tokens.md) — armazenamento de tokens
 
 ## Recursos
 

@@ -254,7 +254,7 @@ test('cross-tenant access blocked', async () => {
 
 - [`../analises/permissoes.md`](../analises/permissoes.md) — IDOR base
 - [`../analises/14-autenticacao-sessao.md`](../analises/14-autenticacao-sessao.md)
-- [`../analises/9-exposicao-dados.md`](../analises/exposicao-dados.md)
+- [`../analises/exposicao-dados.md`](../analises/exposicao-dados.md)
 - [`service-mesh.md`](service-mesh.md) — namespace per tenant
 - [`../analises/22-logging-monitoring.md`](../analises/22-logging-monitoring.md) — audit log
 

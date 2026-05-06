@@ -267,7 +267,7 @@ MCP (Model Context Protocol) servers que expõem tools devem:
 
 - [`ml-ai-security.md`](ml-ai-security.md) — base ML/AI
 - [`../analises/19-injection-server-side.md`](../analises/19-injection-server-side.md) — RCE patterns
-- [`../analises/8-tokens.md`](../analises/tokens.md) — API keys
+- [`../analises/tokens.md`](../analises/tokens.md) — API keys
 - [`../analises/permissoes.md`](../analises/permissoes.md) — autorização
 - [`multi-tenant-saas.md`](multi-tenant-saas.md) — vector DB tenant isolation
 
