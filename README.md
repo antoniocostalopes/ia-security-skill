@@ -62,8 +62,30 @@ JavaScript/TypeScript · Python · PHP · Java · C#/.NET · Go · Ruby · Rust 
 ### Track Mobile (MASVS-aligned)
 iOS Native · Android Native · React Native · Flutter · Xamarin/MAUI · Ionic/Cordova/Capacitor + Storage local · Network/Cert pinning · Deep links · WebView · Biometric · Anti-jailbreak/root · Reverse Engineering · Store distribution
 
-### Outras áreas
-Containers/Kubernetes · IaC (Terraform/CloudFormation) · AWS · GCP · Azure · CI/CD pipelines · ML/AI security · Web3/Smart contracts · IoT/Embedded · Privacidade/Compliance (GDPR/LGPD/CCPA/HIPAA/PCI-DSS)
+### Desktop apps
+Electron · Tauri · Wails — IPC security, renderer isolation, contextIsolation, allowlist, auto-update signing
+
+### Browser extensions
+Chrome · Firefox · Safari — Manifest v3, content scripts, message passing, CSP, permissions, web_accessible_resources
+
+### Outras áreas especializadas
+**Infraestrutura:** Containers/Kubernetes · Container runtime (Falco/AppArmor/seccomp/gVisor) · Service mesh (Istio/Linkerd mTLS) · IaC (Terraform/CloudFormation) · CI/CD pipelines
+
+**Cloud:** AWS · GCP · Azure
+
+**Identity & DNS:** DNS/DNSSEC (subdomain takeover, CAA, AXFR, rebinding) · Email infrastructure (SPF/DKIM/DMARC/BIMI/MTA-STS/TLS-RPT)
+
+**Web platforms:** WebAssembly (WASI, imports/exports, side-channel) · Service workers/PWA (cache poisoning, push auth)
+
+**Arquitetura:** Multi-tenant SaaS (tenant isolation, RLS, cross-tenant IDOR)
+
+**AI/ML/Web3:** LLM agent security (OWASP LLM Top 10, prompt injection, tool use, JWKS) · ML/AI security · Web3/Smart contracts
+
+**Verticals:** Game security (anti-cheat, IAP, server-authoritative) · IoT/Embedded
+
+**Crypto avançada:** Post-quantum crypto (ML-KEM/ML-DSA, híbridos, migration roadmap)
+
+**Compliance:** Privacidade/Compliance (GDPR/LGPD/CCPA/HIPAA/PCI-DSS)
 
 ## Como funciona
 
@@ -71,7 +93,7 @@ O Claude Code lê o frontmatter de [`SKILL.md`](SKILL.md) e ativa a skill quando
 
 A skill executa um workflow em 7 fases:
 
-1. **Reconhecimento** — lê manifests (`package.json`, `composer.json`, `requirements.txt`, `Info.plist`, `Dockerfile`, etc.) para detetar stack
+1. **Reconhecimento** — lê manifests (`package.json`, `composer.json`, `requirements.txt`, `Info.plist`, `Dockerfile`, `manifest.json`, `tauri.conf.json`, `wails.json`, `*.tf`, `*.sol`, etc.) para detetar stack
 2. **Análise universal** — 24 categorias aplicadas a qualquer projeto
 3. **Análise específica** — carrega só os ficheiros de [`linguagens/`](linguagens/) e [`frameworks/`](frameworks/) relevantes
 4. **Attack chains** — combina achados (mínimo 3 cadeias) para escalar severidade
@@ -88,7 +110,9 @@ A IA carrega só o que precisa (não bloat por carregar tudo):
 2. Linguagem (per stack)     → linguagens/    (1-3 ficheiros)
 3. Framework (per stack)     → frameworks/    (1-3 ficheiros)
 + Mobile (se aplicável)      → mobile/        (até 16 ficheiros MASVS)
-+ Outras áreas (se relevante)→ outras-areas/  (containers, IaC, cloud, etc.)
++ Desktop (se aplicável)     → desktop/       (Electron / Tauri / Wails)
++ Extensions (se aplicável)  → extensions/    (Browser extensions MV3)
++ Outras áreas (se relevante)→ outras-areas/  (21 domínios especializados)
 ```
 
 Em runtime: 15-50 ficheiros ativos conforme stack.
@@ -169,13 +193,13 @@ Direto, prestável, honesto. Sem alarmismo teatral. Cada achado tem fix copy-pas
 |---|---|
 | OWASP Top 10 (Web 2021) | 10/10 |
 | OWASP API Security Top 10 (2023) | 10/10 |
-| OWASP Top 10 LLM (2025) | via [`outras-areas/ml-ai-security.md`](outras-areas/ml-ai-security.md) |
+| OWASP Top 10 LLM (2025) | via [`outras-areas/llm-agent-security.md`](outras-areas/llm-agent-security.md) + [`outras-areas/ml-ai-security.md`](outras-areas/ml-ai-security.md) |
 | OWASP MASVS (Mobile) | track mobile completo |
 | OWASP Top 10 IoT | via [`outras-areas/iot-embedded.md`](outras-areas/iot-embedded.md) |
 
 ## Versão
 
-**v1.0.0** — Release inicial pública. Skill nativa Claude Code com 24 análises universais, 18 linguagens, 34 frameworks, track mobile MASVS, áreas especializadas, self-review pass, confidence scoring e 5 examples reais.
+**v1.0.0** — Release inicial pública. Skill nativa Claude Code com 24 análises universais, 18 linguagens, 34 frameworks, track mobile (MASVS), desktop (Electron/Tauri/Wails), browser extensions (MV3), 21 áreas especializadas (incluindo LLM agents, service mesh, DNS, email infra, multi-tenant SaaS, WebAssembly, PWA, games, post-quantum crypto), self-review pass, confidence scoring e 5 examples reais. 155 ficheiros .md.
 
 Ver [CHANGELOG.md](CHANGELOG.md) para detalhes.
 
