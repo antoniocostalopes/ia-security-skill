@@ -11,8 +11,6 @@
 
 > **Skill nativa do Claude Code** para auditoria de segurança defensiva pré-entrega — qualquer linguagem, framework, plataforma. Pensa como invasor, age como defensor, devolve fixes copy-paste.
 
-> *"Encontra agora o que um invasor encontrará depois — e mostra como fechar."*
-
 ## Instalação — 1 comando
 
 ```bash
