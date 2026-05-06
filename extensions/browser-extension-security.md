@@ -119,7 +119,7 @@ E em manifest.json:
 
 **BAD** — armazenar API keys ou tokens em plain:
 ```javascript
-chrome.storage.local.set({ apiKey: 'sk_live_abc123' });
+chrome.storage.local.set({ apiKey: 'sk_live_PLACEHOLDER_xxx' });
 ```
 
 `chrome.storage.local` não é encriptado. Qualquer outra extensão com `storage` permission lê o teu storage? Não — é per-extension. Mas malware com acesso ao perfil Chrome (filesystem) lê tudo.
