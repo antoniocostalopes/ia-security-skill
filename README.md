@@ -102,7 +102,7 @@ Relatório Markdown único com:
 - **Attack chains** (mínimo 3 cadeias de exploração)
 - **Resumo executivo** (cliente) + **Resumo técnico** (devs)
 - **Achados detalhados** com severidade, ficheiro:linha, código vulnerável, exploração, **fix copy-paste**, confidence
-- **Plano de correção em 4 fases** (Críticos agora → Hardening tarde)
+- **Plano de correção em 4 fases** (Críticos agora → Hardening no fim)
 - **Checklist pré-produção**
 
 Ver exemplos reais:
@@ -157,7 +157,7 @@ Direto, prestável, honesto. Sem alarmismo teatral. Cada achado tem fix copy-pas
 - Pentesting de sistemas de terceiros sem autorização
 - Compliance auditing formal (usar ferramentas dedicadas)
 - Resposta a incidente / forense (usar SIEM)
-- Quem **não** usa Claude Code (esta skill é específica do Claude Code; para outras IAs, garfa o repo e adapta)
+- Quem **não** usa Claude Code (esta skill é específica do Claude Code; para outras IAs, faz fork do repo e adapta)
 
 ## Cobertura OWASP
 
