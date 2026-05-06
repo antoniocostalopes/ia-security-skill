@@ -74,6 +74,61 @@ curl -sSL https://raw.githubusercontent.com/antoniocostalopes/ia-security-skill/
 
 Para instruções detalhadas: **[INSTALL.md](INSTALL.md)**.
 
+## Como usar
+
+Após instalar o adaptador da tua IA:
+
+### 1. Invoca a skill
+
+| Cliente | Comando/frase no chat |
+|---|---|
+| **Claude Code** | `audita este projeto` |
+| **Cursor / Windsurf** | `audit` (Cmd+L) |
+| **ChatGPT Custom GPT** | `audita este código` (cola/anexa código) |
+| **GitHub Copilot Chat** | `@workspace audita este projeto` |
+| **Gemini / DeepSeek / Mistral** | (cola `PROMPT.md` primeiro) → `audita este código:` + código |
+| **CLI standalone** | `iass app.js` ou `iass --diff` ou `iass --pr` |
+
+### 2. Recebes relatório em ~30 segundos
+
+Markdown único com:
+- Score 0-100 + nível de blindagem
+- Mapa de superfícies de ataque
+- Attack chains (mínimo 3)
+- Achados detalhados com **fix copy-paste** + confidence (95%/80%/60%)
+- Plano de correção em 4 fases
+- Checklist pré-produção
+
+### 3. Aplica os fixes
+
+Manual (copia "Correção" do relatório) ou pede à IA:
+```
+aplica os fixes Críticos
+```
+
+### 4. Re-audita para validar
+
+```
+audita de novo
+```
+
+Score sobe → marcas checklist → push com confiança.
+
+### Exemplo completo
+
+Vê `examples/audit-example-node.md` para input + output reais. Outros stacks: [Laravel](examples/audit-example-php-laravel.md) · [Django](examples/audit-example-python-django.md) · [Flutter](examples/audit-example-mobile-flutter.md) · [Solidity](examples/audit-example-web3-solidity.md).
+
+### Cenários avançados
+
+| Cenário | Como |
+|---|---|
+| **Pre-commit auto-block** | Setup `integracoes/pre-commit-hook.sh` |
+| **Auto-audit em PRs** | Copy `integracoes/github-action-pr-audit.yml` para `.github/workflows/` |
+| **Hybrid Semgrep + IA** (recall máximo) | `~/.iass/integracoes/semgrep-integration.sh ./src` |
+| **CI/CD pipeline** | `iass --quick src/ \|\| exit 1` |
+
+📖 **Para detalhes completos, cenários, FAQ e personas:** **[USAGE.md](USAGE.md)**.
+
 ## Arquitetura — 3 camadas hierárquicas
 
 A IA carrega o que precisa para o stack detetado. Não bloat por carregar tudo de uma vez.
