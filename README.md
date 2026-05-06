@@ -9,6 +9,8 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![PT](https://img.shields.io/badge/lang-pt--PT-green)]()
 
+> 🇬🇧 [English version](README.en.md)
+
 > **Skill nativa do Claude Code** para auditoria de segurança defensiva pré-entrega — qualquer linguagem, framework, plataforma. Pensa como invasor, age como defensor, devolve fixes copy-paste.
 
 ## Instalação — 1 comando
