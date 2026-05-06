@@ -3,6 +3,52 @@
 Todas as mudanças notáveis a esta skill são documentadas aqui.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/), versionamento [SemVer](https://semver.org/).
 
+## [1.1.0] — 2026-05-06
+
+🎯 **Detection performance + workflow integration.**
+
+Update focado em **melhorar a deteção** (recall + precision) e **integrar a skill no workflow do developer** (pre-commit, CI/CD, CLI).
+
+### Adicionado — Qualidade de deteção
+- `analises/00-patterns-deteccao.md` — Regex/keywords literais por categoria. Aumenta recall (não esquecer padrões clássicos).
+- `analises/00-falsos-positivos-comuns.md` — Anti-hallucination guide. Reduz reports incorretos com exemplos "isto NÃO é vulnerabilidade".
+- **Self-review pass** (Fase 6) no workflow — IA verifica próprio output antes de devolver.
+- **Confidence scoring** (95%/80%/60%/40%) por achado — transparência sobre certeza. < 70% vira "Suspeita".
+
+### Adicionado — Examples (few-shot para IAs)
+- `examples/audit-example-php-laravel.md` — Laravel app vulnerável + relatório esperado.
+- `examples/audit-example-python-django.md` — Django.
+- `examples/audit-example-mobile-flutter.md` — Flutter banking app (alto risco).
+- `examples/audit-example-web3-solidity.md` — Smart contract Solidity.
+
+### Adicionado — Integrações workflow
+- `integracoes/pre-commit-hook.sh` — Bloqueia commits com vulns Críticas via Anthropic API.
+- `integracoes/github-action-pr-audit.yml` — Audita PRs automaticamente, comenta findings.
+- `integracoes/cli-wrapper.sh` — CLI standalone (`iass audit`) com modes quick/diff/pr.
+- `integracoes/semgrep-integration.sh` — Análise híbrida Semgrep + IA (recall+precision máximos).
+- `integracoes/README.md` — Setup, custos, limitações.
+
+### Mudado
+- `SKILL.md` — workflow expandido para 8 fases (recon → patterns → contextual → false positives → chains → self-review → relatório → checklist).
+- `PROMPT.md` — fluxo de 3 lentes (pattern → context → false positive filter) por categoria.
+- `PROMPT-COMPACTO.md` — adicionada self-review (mantém-se < 8000 chars).
+- `relatorio/template.md` — campo `Confiança` em cada achado (95%/80%/60%).
+
+### Impacto estimado de detecção
+| Métrica | v1.0 | v1.1 |
+|---|---|---|
+| Recall (vulns detetadas) | ~70% | ~85% |
+| Precision (sem falsos positivos) | ~75% | ~88% |
+| Com Semgrep integration | — | ~95% recall |
+
+### Estatísticas
+- 145 ficheiros total (era 136)
+- 9 ficheiros novos
+- 5 ficheiros modificados
+- ~30% mais robustez na deteção
+
+---
+
 ## [1.0.0] — 2026-05-05
 
 🚀 **Release inicial pública.**

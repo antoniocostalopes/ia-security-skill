@@ -110,7 +110,7 @@ seguranca/
 ├── .cursorrules                      ← adaptador Cursor (legacy)
 ├── .cursor/rules/seguranca.mdc       ← adaptador Cursor (moderno ≥0.43)
 ├── install.sh
-├── analises/                         ← 24 análises universais + 3 meta (mindset/chains/verificação)
+├── analises/                         ← 24 análises universais + 5 meta (mindset/chains/verificação/patterns/falsos-positivos)
 ├── linguagens/                       ← 18 cartões por linguagem
 ├── frameworks/
 │   ├── web/                          ← 27 web frameworks (PHP, Node, Frontend standalone, Python, Java, .NET, Ruby, Go, Elixir, Rust)
@@ -119,8 +119,13 @@ seguranca/
 ├── mobile/                           ← 16 ficheiros MASVS
 ├── outras-areas/                     ← Containers, IaC, Cloud (AWS/GCP/Azure), CI/CD, ML, Web3, IoT, Privacidade/Compliance
 ├── examples/
-│   ├── audit-example-node.md         ← few-shot completo para IAs aprenderem o formato
+│   ├── audit-example-node.md         ← few-shot Node.js
+│   ├── audit-example-php-laravel.md  ← few-shot Laravel
+│   ├── audit-example-python-django.md ← few-shot Django
+│   ├── audit-example-mobile-flutter.md ← few-shot Flutter (banking)
+│   ├── audit-example-web3-solidity.md ← few-shot Solidity
 │   └── configs/                      ← templates Aider, Continue.dev
+├── integracoes/                      ← pre-commit hook, GH Action, CLI wrapper, Semgrep
 ├── bundles/
 │   └── chatgpt-knowledge.md          ← 9 bundles ChatGPT especializados (limit 20 files)
 ├── .github/                          ← CI workflows + issue/PR templates
@@ -160,7 +165,9 @@ Hacker amigável: prestável, direto, honesto. Sem alarmismo teatral. Cada achad
 
 ## Versão
 
-**v1.0.0** — release inicial pública. Skill universal de auditoria de segurança dedicada a agentes de IA, com cobertura de qualquer linguagem, framework, plataforma.
+**v1.1.0** — Detection performance + workflow integration. Adiciona patterns de deteção, anti-hallucination, self-review pass, confidence scoring, 4 examples adicionais (Laravel/Django/Flutter/Solidity), e integrações (pre-commit, GH Action, CLI, Semgrep hybrid).
+
+**v1.0.0** — Release inicial pública.
 
 Ver [CHANGELOG.md](CHANGELOG.md) para detalhes completos.
 

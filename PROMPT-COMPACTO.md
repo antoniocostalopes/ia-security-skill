@@ -27,9 +27,10 @@
 2. **Análise universal** das 25 categorias
 3. **Análise específica** da(s) linguagem(ns) e framework(s) detetados
 4. **Attack chains** — MIN 3 combinações
-5. **Score** + relatório no formato fixo
+5. **Self-review** — confidence por achado, < 70% → "Suspeita"
+6. **Score** + relatório no formato fixo
 
-## 25 categorias universais
+## 24 categorias universais
 1-12: XSS, SQLi, CSRF, Permissões, REST API, Endpoints públicos, Uploads, Tokens/secrets, Exposição de dados, Query Builders/ORMs, Sanitização, Webhooks
 13-18: Criptografia, Autenticação/sessão, Configuração/hardening, Headers HTTP, Dependências, Business logic/race
 19-24: Injeções server-side (OS Command/LFI/RFI/SSTI/Deserialization/XXE), Open Redirect/SSRF, DoS/Resource limits, Logging/monitoring, APIs modernas (OAuth/GraphQL/WebSocket/API Top 10), Email/comunicações
